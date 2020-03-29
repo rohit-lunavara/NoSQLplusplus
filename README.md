@@ -10,10 +10,13 @@ NoSQL implementation in C++
 Creating a Key-Value store like Redis in C++.
 
 ## Initial work
-
+Do literature review to find some reference about NoSQL database implementation.  
+Design API and classes that we would use. For example, we would need **get**, **set**, 
+**add**, **delete**, **find**, etc. Because we want to support different data structures and different data type, we should seperate the interface and the implementation and consider using generic programming.  
 
 ## Testing
-
+We should use some simple data to test each function.  
+We can test our program against other implementation such as Redis.
 
 ## Measurable aspects
 Some of the measurable aspects of the project are performance changes in basic operations such as read, write, delete due to :
@@ -21,17 +24,18 @@ Some of the measurable aspects of the project are performance changes in basic o
 2. Collision resolution techniques such as Seperate Chaining and Open Addressing (Quadratic Probing, Hopscotch Hashing, etc).
 
 ## Plan for releases
-* R0.8 
-Implementing different data structures along with different hash collision techniques to find out the best combination for our implementation.
+* R0.8   
+Implementing different data structures along with different hash collision techniques to find out the best combination for our implementation.  
 No concurrency support.
 
-* R1.0
-Optimizing for in-memory operations using memory alignment.
-Extending the API to include common operations of NoSQL databases.
-Concurrency support for read.
+* R1.0  
+Optimizing for in-memory operations using memory alignment.  
+Extending the API to include common operations of NoSQL databases.  
+Concurrency support for read.   
+Find some fancy applications to show our performance (astronomy, music, image, web)  
 
-* R1.2
-Optimizing for a certain type of secondary memory. (SSDs, HDDs)
+* R1.2  
+Optimizing for a certain type of secondary memory. (SSDs, HDDs)  
 Concurrency support for all operations.
 
 ## References
