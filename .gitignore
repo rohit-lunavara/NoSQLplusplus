@@ -1,0 +1,6 @@
+src/CMakeFiles/
+src/tests/CMakeFiles/
+Makefile
+cmake_install.cmake
+CMakeCache.txt
+.DS_Store
