@@ -6,7 +6,8 @@
 #include <cstdarg>
 
 template <class KeyType, class ValueType>
-class HashClient
+class HashClient:
+	public Client<KeyType, ValueType>
 {
 private:
 	std::unordered_map<KeyType, ValueType> data_;
