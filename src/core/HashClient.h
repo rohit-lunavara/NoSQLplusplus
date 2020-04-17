@@ -1,3 +1,4 @@
+#pragma once
 #include "Client.h"
 
 #include <unordered_map>
