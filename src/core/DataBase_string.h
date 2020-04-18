@@ -4,19 +4,19 @@
 #include <cstdarg>
 #include "HashTable.h"
 
-template <class ValueType>
-class DataBase<std::string, ValueType>
+template <>
+class DataBase<std::string, std::string>
 {
 private:
-	HashTable<std::string, ValueType> internalStorage_;
+	HashTable<std::string, std::string> internalStorage_;
 public:
-    const ValueType& get(const std::string& key);
-	bool set(const std::string& key, const ValueType& value...);
+    const std::string& get(const std::string& key);
+	bool set(const std::string& key, const std::string& value...);
     bool del(const std::string& key);
 };
 
-template <class ValueType>
-const ValueType& DataBase<std::string, ValueType>::get(const std::string& key)
+
+const std::string& DataBase<std::string, std::string>::get(const std::string& key)
 {
 	auto iter = internalStorage_.find(key);
 	if (iter == internalStorage_.end())
@@ -28,9 +28,9 @@ const ValueType& DataBase<std::string, ValueType>::get(const std::string& key)
 	return iter->second;
 }
 
-template <class ValueType>
-bool DataBase<std::string, ValueType>::set(const std::string& key,
- const ValueType& value...)
+
+bool DataBase<std::string, std::string>::set(const std::string& key,
+ const std::string& value...)
 {
 	bool all_ok = false;
 	bool has_opt = false;
