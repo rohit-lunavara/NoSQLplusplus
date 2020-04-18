@@ -28,7 +28,7 @@ const ValueType& HashClient<KeyType, ValueType>::get(const KeyType& key)
 		ss << "key " << key << " does not exist!";
 		throw std::runtime_error(ss.str());
 	}
-
+	
 	return iter->second;
 }
 
@@ -43,7 +43,7 @@ bool HashClient<KeyType, ValueType>::set(const KeyType& key, const ValueType& va
 	std::va_list args;
     va_start(args, value);
     // TODO - Handle time options
-    char opt = va_arg(args, int);
+    char opt = static_cast<char>(va_arg(args, int));
     if (opt == 'n')
     {
 		if (iter == data_.end()) {
@@ -58,6 +58,9 @@ bool HashClient<KeyType, ValueType>::set(const KeyType& key, const ValueType& va
 			all_ok = true ;
 		}
 		has_opt = true;
+    }
+    else if (opt == 't')
+    {
     }
 	va_end(args);
 
