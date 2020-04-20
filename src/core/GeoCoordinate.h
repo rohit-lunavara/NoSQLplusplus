@@ -1,6 +1,7 @@
 #include <ostream>
 
-constexpr double EARTH_RADIUS = 6371.; // km
+constexpr double MEAN_EARTH_RADIUS = 6371.; // km
+constexpr double pi = 3.1415926535897932;
 
 constexpr long double operator"" _N (long double latitude)
 {

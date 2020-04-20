@@ -25,7 +25,7 @@ int main()
 	cout << db.get("New York") << '\n';
 	cout << db.get("London") << '\n';
 	
-	cout << "distance: " << db.distance("New York", "London") << '\n';
+	cout << "distance: " << db.distance("New York", "London") << "km\n";
 
 	// this does not compile
 	// DataBase<int, int> db;
