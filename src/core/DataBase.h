@@ -34,21 +34,21 @@ bool DataBase<KeyType, ValueType>::del(const KeyType& key)
 }
 
 template <class KeyType, class ValueType>
-bool rename(const KeyType& key)
+bool DataBase<KeyType, ValueType>::rename(const KeyType& key)
 {
     KeyType::unimplemented_function;
     ValueType::unimplemented_function;    
 }
 
 template <class KeyType, class ValueType>
-bool exist(const KeyType& key)
+bool DataBase<KeyType, ValueType>::exist(const KeyType& key)
 {
     KeyType::unimplemented_function;
     ValueType::unimplemented_function;
 }
 
 template <class KeyType, class ValueType>
-const KeyType& random()
+const DataBase<KeyType, ValueType>::KeyType& random()
 {
     KeyType::unimplemented_function;
     ValueType::unimplemented_function;
@@ -56,5 +56,5 @@ const KeyType& random()
 
 
 #include "DataBase_string.h"
-//#include "DataBase_geo.h"
+#include "DataBase_GeoCoordinate.h"
 
