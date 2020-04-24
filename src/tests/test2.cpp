@@ -15,9 +15,9 @@ void test1()
 	// cout << db.distance("hello", "hello") << '\n';
 }
 
-
-int main()
+void test2()
 {
+	using namespace Geography;
 	DataBase<string, GeoCoordinate> db;
 	cout << db.set("New York", {40.7128_N, 74.0060_E}) << '\n';
 	cout << db.set("London", {51.5074_N, 0.1278_W}) << '\n';
@@ -26,7 +26,15 @@ int main()
 	cout << db.get("London") << '\n';
 	
 	cout << "distance: " << db.distance("New York", "London") << "km\n";
+}
 
+// 1. write down why using data type
+// 2. dataset bigger: cities, locations 
+
+int main()
+{
+	test1();
+	test2();
 	// this does not compile
 	// DataBase<int, int> db;
 	// cout << db.set(1, 2) << '\n';

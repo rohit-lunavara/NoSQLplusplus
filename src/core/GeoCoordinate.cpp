@@ -1,7 +1,9 @@
 #include "GeoCoordinate.h"
 #include <ostream>
 #include <stdexcept>
+#include <cmath>
 
+namespace Geography {
 GeoCoordinate::GeoCoordinate(float latitude, float longitude)
 {
     if (latitude < -85.05112878 || latitude > 85.05112878 ||
@@ -35,4 +37,22 @@ std::ostream& operator<<(std::ostream& os, const GeoCoordinate& coord)
         os << -coord.longitude << 'W';
     }
     return os;
+}
+
+
+double distance(const GeoCoordinate& coord1, const GeoCoordinate& coord2)
+{
+    double phi1 = pi / 180. * coord1.latitude;
+    double phi2 = pi / 180. * coord2.latitude;
+
+    double dphi = phi1 - phi2;
+    double dlam = pi / 180. * (coord1.longitude - coord2.longitude);
+
+    double a = sin(0.5 * dphi) * sin(0.5 * dphi)
+        + cos(phi1) * cos(phi2) * sin(0.5 * dlam) * sin(0.5 * dlam);
+    double c = 2 * atan2(sqrt(a), sqrt(1-a));
+
+    return MEAN_EARTH_RADIUS * c;   
+}
+
 }
