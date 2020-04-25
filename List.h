@@ -9,7 +9,7 @@
 #include <string>
 #include <deque>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -38,13 +38,10 @@ public:
     //Returns the size of the list.
     int rpushx(string key, string value);
     
-    //Inserts the value at at the index before the before parameter.
+    //Inserts the value at at the index before or after the pivot parameter.
     //Returns the size of the list.
-    int linsertbefore(string key, string before, string value);
-    
-    //Inserts the value at at the index after the after parameter.
-    //Returns the size of the list.
-    int linsertafter(string key, string after, string value);
+    //Returns -1 if the pivot or key is not found.
+    int linsert(string key, string pivot, string value, bool before);
     
     //Returns a vector of all string values in the given range.
     //Negative values will be count from the tail.
@@ -76,5 +73,5 @@ public:
     //Returns the size of a list for a given key.
     int llen(string key);
 private:
-    map<string, deque<string>> m;
+    unordered_map<string, deque<string>> m;
 };
