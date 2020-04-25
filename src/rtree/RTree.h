@@ -1,21 +1,11 @@
-#ifndef RTREE_H
-#define RTREE_H
+#pragma once
 
-// NOTE This file compiles under MSVC 6 SP5 and MSVC .Net 2003 it may not work on other compilers without modification.
-
-// NOTE These next few lines may be win32 specific, you may need to modify them to compile on other platform
-#include <stdio.h>
-#include <math.h>
-#include <assert.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cmath>
+#include <cassert>
+#include <cstdlib>
 
 #define ASSERT assert // RTree uses ASSERT( condition )
-#ifndef Min
-  #define Min std::min 
-#endif //Min
-#ifndef Max
-  #define Max std::max 
-#endif //Max
 
 //
 // RTree.h
@@ -486,7 +476,10 @@ RTREE_QUAL::~RTree()
 
 
 RTREE_TEMPLATE
-void RTREE_QUAL::Insert(const ELEMTYPE a_min[NUMDIMS], const ELEMTYPE a_max[NUMDIMS], const DATATYPE& a_dataId)
+void RTREE_QUAL::Insert(
+  const ELEMTYPE a_min[NUMDIMS], 
+  const ELEMTYPE a_max[NUMDIMS], 
+  const DATATYPE& a_dataId)
 {
 #ifdef _DEBUG
   for(int index=0; index<NUMDIMS; ++index)
@@ -889,7 +882,12 @@ void RTREE_QUAL::InitRect(Rect* a_rect)
 // The level argument specifies the number of steps up from the leaf
 // level to insert; e.g. a data rectangle goes in at level = 0.
 RTREE_TEMPLATE
-bool RTREE_QUAL::InsertRectRec(Rect* a_rect, const DATATYPE& a_id, Node* a_node, Node** a_newNode, int a_level)
+bool RTREE_QUAL::InsertRectRec(
+  Rect* a_rect, 
+  const DATATYPE& a_id, 
+  Node* a_node, 
+  Node** a_newNode, 
+  int a_level)
 {
   ASSERT(a_rect && a_node && a_newNode);
   ASSERT(a_level >= 0 && a_level <= a_node->m_level);
@@ -905,7 +903,8 @@ bool RTREE_QUAL::InsertRectRec(Rect* a_rect, const DATATYPE& a_id, Node* a_node,
     if (!InsertRectRec(a_rect, a_id, a_node->m_branch[index].m_child, &otherNode, a_level))
     {
       // Child was not split
-      a_node->m_branch[index].m_rect = CombineRect(a_rect, &(a_node->m_branch[index].m_rect));
+      a_node->m_branch[index].m_rect = CombineRect(a_rect, 
+        &(a_node->m_branch[index].m_rect));
       return false;
     }
     else // Child was split
@@ -919,7 +918,7 @@ bool RTREE_QUAL::InsertRectRec(Rect* a_rect, const DATATYPE& a_id, Node* a_node,
   else if(a_node->m_level == a_level) // Have reached level for insertion. Add rect, split if necessary
   {
     branch.m_rect = *a_rect;
-    branch.m_child = (Node*) a_id;
+    branch.m_child = reinterpret_cast<Node*>(a_id);
     // Child field of leaves contains id of data record
     return AddBranch(&branch, a_node, a_newNode);
   }
@@ -940,7 +939,10 @@ bool RTREE_QUAL::InsertRectRec(Rect* a_rect, const DATATYPE& a_id, Node* a_node,
 // InsertRect2 does the recursion.
 //
 RTREE_TEMPLATE
-bool RTREE_QUAL::InsertRect(Rect* a_rect, const DATATYPE& a_id, Node** a_root, int a_level)
+bool RTREE_QUAL::InsertRect(Rect* a_rect, 
+  const DATATYPE& a_id, 
+  Node** a_root, 
+  int a_level)
 {
   ASSERT(a_rect && a_root);
   ASSERT(a_level >= 0 && a_level <= (*a_root)->m_level);
@@ -1054,7 +1056,7 @@ int RTREE_QUAL::PickBranch(Rect* a_rect, Node* a_node)
   
   bool firstTime = true;
   ELEMTYPEREAL increase;
-  ELEMTYPEREAL bestIncr = (ELEMTYPEREAL)-1;
+  ELEMTYPEREAL bestIncr = static_cast<ELEMTYPEREAL>(-1);
   ELEMTYPEREAL area;
   ELEMTYPEREAL bestArea;
   int best;
@@ -1094,8 +1096,10 @@ typename RTREE_QUAL::Rect RTREE_QUAL::CombineRect(Rect* a_rectA, Rect* a_rectB)
 
   for(int index = 0; index < NUMDIMS; ++index)
   {
-    newRect.m_min[index] = Min(a_rectA->m_min[index], a_rectB->m_min[index]);
-    newRect.m_max[index] = Max(a_rectA->m_max[index], a_rectB->m_max[index]);
+    using std::min;
+    using std::max;
+    newRect.m_min[index] = min(a_rectA->m_min[index], a_rectB->m_min[index]);
+    newRect.m_max[index] = max(a_rectA->m_max[index], a_rectB->m_max[index]);
   }
 
   return newRect;
@@ -1599,5 +1603,3 @@ bool RTREE_QUAL::Search(
 
 #undef RTREE_TEMPLATE
 #undef RTREE_QUAL
-
-#endif //RTREE_H
