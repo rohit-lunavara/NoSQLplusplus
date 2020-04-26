@@ -34,9 +34,17 @@ public:
     GeoCoordinate(float latitude = 0., float longitude = 0.);
     friend std::ostream& operator<<(std::ostream& os, const GeoCoordinate& coord);
     friend double distance(const GeoCoordinate& coord1, const GeoCoordinate& coord2);
+    friend void combine_sphere(GeoCoordinate& c, double& r,
+        const GeoCoordinate& c1, double r1,
+        const GeoCoordinate& c2, double r2);
 };
 
 std::ostream& operator<<(std::ostream& os, const GeoCoordinate& coord);
 
 double distance(const GeoCoordinate& coord1, const GeoCoordinate& coord2);
+
+
+void combine_sphere(GeoCoordinate& c, double& r,
+        const GeoCoordinate& c1, double r1,
+        const GeoCoordinate& c2, double r2);
 }

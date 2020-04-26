@@ -171,12 +171,22 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::add_branch(
         }
 }
 
+
 template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
         std::shared_ptr<Node> node, 
         const Branch& branch, 
         std::shared_ptr<Node>& newNode)
 {
+        // load branch buffer from full node and an extra branch
+        std::array<Branch, NMAXNODES+1> branchBuffer;
+        for (int i = 0; i < NMAXNODES; ++i)
+        {
+                branchBuffer[i] = node->branches[i];
+        }
+        branchBuffer[NMAXNODES] = branch;
+
+        // calculate the bound for all branches
         
 }
 
