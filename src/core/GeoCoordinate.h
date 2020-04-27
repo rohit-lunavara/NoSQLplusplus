@@ -47,4 +47,7 @@ double distance(const GeoCoordinate& coord1, const GeoCoordinate& coord2);
 void combine_sphere(GeoCoordinate& c, double& r,
         const GeoCoordinate& c1, double r1,
         const GeoCoordinate& c2, double r2);
+
+double spherical_area(double radius);
+
 }

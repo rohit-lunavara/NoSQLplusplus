@@ -187,7 +187,35 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
         branchBuffer[NMAXNODES] = branch;
 
         // calculate the bound for all branches
-        
+        Geography::GeoCoordinate c_cover = branchBuffer[0].center;
+        double r_cover = branchBuffer[0].radius;
+        for (int i = 1; i < NMAXNODES+1; ++i)
+        {
+                Geography::GeoCoordinate c_temp;
+                double r_temp;
+                Geography::combine_sphere(c_temp, r_temp, 
+                        c_cover, r_cover,
+                        branchBuffer[i].center,
+                        branchBuffer[i].radius);
+                c_cover = c_temp;
+                r_cover = r_temp;
+        }
+        double area_cover = Geography::spherical_area(r_cover);
+
+
+        node->level = -1;
+        node->count = 0;
+
+
+        int level = node->level;
+        int count_all = NMAXNODES+1;
+        int min_fill = NMINNODES;
+
+        // choose partition
+        int count_l = 0;
+        int count_r = 0;
+        double area_l = 0.;
+        double area_r = 0.;
 }
 
 template <class KeyType, int NMAXNODES, int NMINNODES>

@@ -129,4 +129,11 @@ void combine_sphere(GeoCoordinate& c, double& r,
         }
 }
 
+double spherical_area(double radius)
+{
+        return 4 * pi * MEAN_EARTH_RADIUS * MEAN_EARTH_RADIUS 
+                * sin(0.5 * radius / MEAN_EARTH_RADIUS)
+                * sin(0.5 * radius / MEAN_EARTH_RADIUS);
+}
+
 }
