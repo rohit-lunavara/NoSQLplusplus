@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -33,6 +34,10 @@ std::ostream& operator<<(std::ostream& os, const GeoCoordinate& coord)
     {
          os << -coord.latitude << 'S';
     }
+    else
+    {
+            os << 0.;
+    }
     os << ", ";
 
     if (coord.longitude > 0.)
@@ -42,6 +47,10 @@ std::ostream& operator<<(std::ostream& os, const GeoCoordinate& coord)
     else if (coord.longitude < 0.)
     {
         os << -coord.longitude << 'W';
+    }
+    else
+    {
+            os << 0.;
     }
     return os;
 }
@@ -91,42 +100,49 @@ void combine_sphere(GeoCoordinate& c, double& r,
                 double y1 = sin(theta1) * sin(phi1);
                 double z1 = cos(theta1);
 
-                cout << "z1: " << z1 << endl;
 
                 double x2 = sin(theta2) * cos(phi2);
                 double y2 = sin(theta2) * sin(phi2);
                 double z2 = cos(theta2);
 
-                cout << "z2: " << z2 << endl;
 
                 double total_angle = acos(x1*x2 + y1*y2 + z1*z2);
                 double angle1 = 0.5 * (dist + r2 - r1) / dist * total_angle;
                 double angle2 = total_angle - angle1;
 
-                double r = sin(angle1) / (sin(angle1) + sin(angle2));
+                double rr = sin(angle1) / (sin(angle1) + sin(angle2));
 
-                cout << r << endl;
 
-                double x = (1 - r) * x1 + r * x2;
-                double y = (1 - r) * y1 + r * y2;
-                double z = (1 - r) * z1 + r * z2;
+                double x = (1 - rr) * x1 + rr * x2;
+                double y = (1 - rr) * y1 + rr * y2;
+                double z = (1 - rr) * z1 + rr * z2;
                 
-                cout << "z: " << z << endl;
 
                 double norm = sqrt(x*x + y*y + z*z);
+
                 cout << "norm: " << norm << endl;
+                if (fabs(norm) > 1e-12)
+                {
+                        double theta = acos(z / norm);
+                        
+                        double phi = atan2(y, x);
 
-                double theta = acos(z / norm);
-
-                cout << 180 / pi * theta << endl;
-
-                double phi = atan2(y, x);
-
-                c.latitude = 180. / pi * (0.5 * pi - theta);
-                c.longitude = 180. / pi * phi;
-
-                r = 0.5 * (dist + r1 + r2);
+                        c.latitude = 180. / pi * (0.5 * pi - theta);
+                        c.longitude = 180. / pi * phi;
+                        r = 0.5 * (dist + r1 + r2);
+                }
+                else // cover the full earth
+                {
+                        c = c1;
+                        r = numeric_limits<double>::infinity();
+                }
         }
+
+        if (r >= pi * MEAN_EARTH_RADIUS)
+        {
+                r = numeric_limits<double>::infinity();
+        }
+
 }
 
 double spherical_area(double radius)

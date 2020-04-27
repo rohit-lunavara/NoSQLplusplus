@@ -33,6 +33,36 @@ private:
                 std::variant<std::shared_ptr<Node>, KeyType> storage;
         };
 
+        struct PartitionVars
+        {
+                int partition[NMAXNODES+1];
+                bool is_taken[NMAXNODES+1];
+
+                int count_total;
+                int min_fill;
+
+                int branch_count[2];
+                Geography::GeoCoordinate branch_center[2];
+                double branch_radius[2];
+                double branch_area[2];
+
+                std::array<Branch, NMAXNODES+1> branch_buffer;
+                Geography::GeoCoordinate split_center;
+                double split_radius;
+                double split_area;
+                
+                PartitionVars(int count_total, int min_fill):
+                        count_total(count_total),
+                        min_fill(min_fill)
+                {
+                        for (int i = 0; i < NMAXNODES + 1; ++i)
+                        {
+                                partition[i] = -1;
+                                is_taken[i] = false;
+                        }
+                }
+        };
+
         std::shared_ptr<Node> root_;
 public:
         SphericalRTree();
@@ -81,6 +111,10 @@ private:
                 std::shared_ptr<Node> node, 
                 const Branch& branch, 
                 std::shared_ptr<Node>& newNode);
+        
+        void pick_seeds(PartitionVars& parVars);
+
+        void classify(int index, int group, PartitionVars& parVars);
 };
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
@@ -142,7 +176,7 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
         {
                 Branch branch;
                 branch.center = value;
-                std::get<KeyType>(branch.storage) = key;
+                branch.storage = key;
                 // 
         }
         else
@@ -179,29 +213,31 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
         std::shared_ptr<Node>& newNode)
 {
         // load branch buffer from full node and an extra branch
-        std::array<Branch, NMAXNODES+1> branchBuffer;
+        PartitionVars partitionVars(NMAXNODES+1, NMINNODES);
         for (int i = 0; i < NMAXNODES; ++i)
         {
-                branchBuffer[i] = node->branches[i];
+                partitionVars.branch_buffer[i] = node->branches[i];
         }
-        branchBuffer[NMAXNODES] = branch;
+        partitionVars.branch_buffer[NMAXNODES] = branch;
 
         // calculate the bound for all branches
-        Geography::GeoCoordinate c_cover = branchBuffer[0].center;
-        double r_cover = branchBuffer[0].radius;
+        partitionVars.split_center = partitionVars.branchBuffer[0].center;
+        partitionVars.split_radius = partitionVars.branchBuffer[0].radius;
         for (int i = 1; i < NMAXNODES+1; ++i)
         {
-                Geography::GeoCoordinate c_temp;
-                double r_temp;
-                Geography::combine_sphere(c_temp, r_temp, 
-                        c_cover, r_cover,
-                        branchBuffer[i].center,
-                        branchBuffer[i].radius);
-                c_cover = c_temp;
-                r_cover = r_temp;
+                Geography::combine_sphere(
+                        partitionVars.split_center, 
+                        partitionVars.split_radius, 
+                        partitionVars.split_center,
+                        partitionVars.split_radius,
+                        partitionVars.branch_buffer[i].center,
+                        partitionVars.branch_buffer[i].radius);
         }
-        double area_cover = Geography::spherical_area(r_cover);
+        partitionVars.split_area = 
+                Geography::spherical_area(partitionVars.split_radius);
 
+        // pick seeds
+        pick_seeds(partitionVars);
 
         node->level = -1;
         node->count = 0;
@@ -216,6 +252,66 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
         int count_r = 0;
         double area_l = 0.;
         double area_r = 0.;
+}
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_seeds(PartitionVars& parVars)
+{
+        double area[NMAXNODES+1];
+        for (int i = 0; i < parVars.count_total; ++i)
+        {
+                area[i] = Geography::spherical_area(
+                        parVars.branch_buffer[i].radius);
+        }
+
+        int seed0, seed1;
+        double worst = -parVars.split_area - 1.;
+        // for all pairs
+        for (int i = 0; i < parVars.count_total-1; ++i)
+        {
+                for (int j = i + 1; j < parVars.count_total; ++i)
+                {
+                        Geography::GeoCoordinate geo;
+                        double radius;
+                        Geography::combine_sphere(geo, radius, 
+                                parVars.branch_buffer[i].center,
+                                parVars.branch_buffer[i].radius,
+                                parVars.branch_buffer[j].center,
+                                parVars.branch_buffer[j].radius);
+                        double newArea = Geography::spherical_area(radius);
+                        double waste = newArea - area[i] - area[j];
+                        if(waste > worst)
+                        {
+                                worst = waste;
+                                seed0 = i;
+                                seed1 = j;
+                        }
+                }
+        }
+
+        classify(seed0, 0, parVars);
+        classify(seed1, 1, parVars);
+}
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::classify(
+        int index, int group, PartitionVars& parVars)
+{
+        if (parVars.is_taken[index])
+        {
+                throw std::runtime_error("the index is already taken!");
+        }
+        parVars.partition[index] = group;
+
+        if (parVars.branch_count[group] == 0)
+        {
+                parVars.branch_center[group] = parVars.branch_buffer[index].center;
+                parVars.branch_radius[group] = parVars.branch_buffer[index].radius;
+        }
+        else
+        {
+
+        }
 }
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
