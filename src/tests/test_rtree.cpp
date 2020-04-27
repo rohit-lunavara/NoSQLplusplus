@@ -1,4 +1,7 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "SphericalRTree.h"
 #include "GeoCoordinate.h"
 
@@ -50,8 +53,61 @@ int main()
         // test1();
         // test2();
         // test3();
+        
         SphericalRTree<string> rtree;
-        rtree.insert("New York", {40.7128_N, 74.0060_E}, 0.);
+        cout << "begin" << endl;
+        ifstream fin("uscities.txt");
+        while (fin)
+        {
+                string s;
+                if (!getline(fin, s))
+                {
+                        break;
+                }
+
+                istringstream ss(s);
+                int index = 0;
+                stringstream cityname;
+                float latitude;
+                float longitude;
+
+                while(ss)
+                {
+                        string entry;
+                        if (!getline(ss, entry, ','))
+                        {
+                                break;
+                        }
+                        
+                        if (index == 0)
+                        {
+                                cityname << entry << ", ";
+                        }
+                        else if (index == 1)
+                        {
+                                cityname << entry;
+                        }
+                        else if (index == 2)
+                        {
+                                latitude =  stof(entry);
+                        }
+                        else if (index == 3)
+                        {
+                                longitude = stof(entry);
+                        }
+
+                        ++index;
+                }
+
+                cout << cityname.str() << endl;
+                cout << latitude << endl;
+                cout << longitude << endl;
+                rtree.insert(cityname.str(), {latitude, longitude}, 0.);
+        }
+
+
+        
+        
 
         return 0;
 }

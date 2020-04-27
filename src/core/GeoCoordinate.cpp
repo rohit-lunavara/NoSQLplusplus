@@ -80,11 +80,12 @@ void combine_sphere(GeoCoordinate& c, double& r,
 
         if (dist + r1 <= r2) // sphere 1 is in sphere 2
         {
-                c = c2;
-                cout << c << endl;
-                cout << c1 << endl;
-                
+                c = c2;              
                 r = r2;
+                // cout << "c1: " << c1 << endl;
+                // cout << "c2: " << c2 << endl;
+                // cout << "c: " << c << endl;
+                // cout << "r: " << r1 << ", " << r2 << ", " << r << endl;
         }
         else if (dist + r2 <= r1) // sphere 2 is in sphere 1
         {
@@ -139,12 +140,16 @@ void combine_sphere(GeoCoordinate& c, double& r,
                         c = c1;
                         r = numeric_limits<double>::infinity();
                 }
+
+               
         }
 
         if (r >= pi * MEAN_EARTH_RADIUS)
         {
                 r = numeric_limits<double>::infinity();
         }
+
+        // cout << "merge r: " << r << endl;
 
 }
 

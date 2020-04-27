@@ -117,6 +117,13 @@ private:
         void choose_partition(PartitionVars& parVars);
 
         void classify(int index, int group, PartitionVars& parVars);
+
+        void node_cover(Geography::GeoCoordinate& center, double& radius,
+                std::shared_ptr<Node> node);
+        
+        int pick_branch(const Geography::GeoCoordinate& center,
+                double radius, 
+                std::shared_ptr<Node> node);
 };
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
@@ -151,14 +158,69 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_(
         int level)
 {
         std::shared_ptr<Node> newNode;
-        // root split
+       
         if (insert_to_node_recursive_(key, value, radius, root, newNode, level))
-        {
+        {  // root split
+                //std::cout << "root split\n";
+                auto newRoot = std::make_shared<Node>();
+                newRoot->level = root->level + 1;
+                newRoot->count = 0;
+
+                Branch branch0, branch1;
+                node_cover(branch0.center, branch0.radius, root);
+                node_cover(branch1.center, branch1.radius, newNode);
+
+                branch0.storage = root;
+                branch1.storage = newNode;
+
+                std::shared_ptr<Node> temp;
+                add_branch(branch0, newRoot, temp);
+                add_branch(branch1, newRoot, temp);
 
                 return true;
         }
 
         return false;
+}
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+int SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_branch(
+        const Geography::GeoCoordinate& center,
+        double radius, 
+        std::shared_ptr<Node> node)
+{
+        bool firstTime = true;
+        double bestIncr = -1.;
+        double bestArea = -1.;
+        int best = -1;
+        for (int i = 0; i < node->count; ++i)
+        {
+                const Geography::GeoCoordinate& curctr = node->branches[i].center;
+                double currad = node->branches[i].radius;
+                double curarea = Geography::spherical_area(currad);
+
+                Geography::GeoCoordinate combctr;
+                double combrad;
+                Geography::combine_sphere(combctr, combrad,
+                        curctr, currad, center, radius);
+                
+                double increase = Geography::spherical_area(combrad) - curarea;
+                if (increase < bestIncr || firstTime)
+                {
+                        firstTime = false;
+                        bestIncr = increase;
+                        bestArea = curarea;
+                        best = i;
+                }
+                else if (increase == bestIncr && curarea < bestArea)
+                {
+                        bestArea = curarea;
+                        best = i;
+                }
+
+        }
+
+        return best;
 }
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
@@ -170,16 +232,42 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
         std::shared_ptr<Node>& newNode,
         int level)
 {
+        std::shared_ptr<Node> otherNode;
+
         if (node->level > level) // above insertion level
         {
-                // TODO
-                // pick branch
+                int index = pick_branch(value, radius, node);
+                if (!insert_to_node_recursive_(key, value, radius, 
+                        std::get<std::shared_ptr<Node>>(node->branches[index].storage),
+                        otherNode, level))
+                { // child was not split
+                        Geography::combine_sphere(
+                                node->branches[index].center,
+                                node->branches[index].radius,
+                                node->branches[index].center,
+                                node->branches[index].radius,
+                                value, radius);
+                        return false;
+                }
+                else // child was split
+                {
+                        node_cover(node->branches[index].center, 
+                                node->branches[index].radius,
+                        std::get<std::shared_ptr<Node>>(node->branches[index].storage));
+
+                        Branch branch;
+                        branch.storage = otherNode;
+                        node_cover(branch.center, branch.radius, otherNode);
+                        return add_branch(branch, node, newNode);
+                }
 
         }
         else if (node->level == level) // reach 
         {
+                //std::cout << "node = level\n";
                 Branch branch;
                 branch.center = value;
+                branch.radius = radius;
                 branch.storage = key;
                 
                 return add_branch(branch, node, newNode);
@@ -205,11 +293,28 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::add_branch(
         }
         else
         {
+                //std::cout << "split node\n";
                 split_node(node, branch, newNode);
                 return true;
         }
 }
 
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::node_cover(
+        Geography::GeoCoordinate& center, double& radius,
+        std::shared_ptr<Node> node)
+{
+        center = node->branches[0].center;
+        radius = node->branches[0].radius;
+        for (int i = 1; i < node->count; ++i)
+        {
+                Geography::combine_sphere(
+                        center, radius,
+                        center, radius,
+                        node->branches[i].center,
+                        node->branches[i].radius);
+        }
+}
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
@@ -219,17 +324,25 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
 {
         // load branch buffer from full node and an extra branch
         PartitionVars partitionVars(NMAXNODES+1, NMINNODES);
+        //std::cout << "initialize partition vars\n";
+
         for (int i = 0; i < NMAXNODES; ++i)
         {
                 partitionVars.branch_buffer[i] = node->branches[i];
         }
         partitionVars.branch_buffer[NMAXNODES] = branch;
-
+        //std::cout << "branch buffer\n";
         // calculate the bound for all branches
         partitionVars.split_center = partitionVars.branch_buffer[0].center;
         partitionVars.split_radius = partitionVars.branch_buffer[0].radius;
         for (int i = 1; i < NMAXNODES+1; ++i)
         {
+                //std::cout << "center: " << partitionVars.split_center << "\n";
+                //std::cout << "radius: " << partitionVars.split_radius << "\n";
+
+                //std::cout << "merge with: " << partitionVars.branch_buffer[i].center << "\n";
+                //std::cout << "merge with: " << partitionVars.branch_buffer[i].radius << "\n";
+                
                 Geography::combine_sphere(
                         partitionVars.split_center, 
                         partitionVars.split_radius, 
@@ -237,15 +350,23 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
                         partitionVars.split_radius,
                         partitionVars.branch_buffer[i].center,
                         partitionVars.branch_buffer[i].radius);
+                
+                //std::cout << "merge center: " << partitionVars.split_center << "\n";
+                //std::cout << "merge radius: " << partitionVars.split_radius << "\n";
         }
+
+        //std::cout << "split radius: " << partitionVars.split_radius << "\n";
         partitionVars.split_area = 
                 Geography::spherical_area(partitionVars.split_radius);
+        //std::cout << "split area: " << partitionVars.split_area << "\n";
 
         pick_seeds(partitionVars);
+        //std::cout << "pick seeds finished\n";
         choose_partition(partitionVars);
+        //std::cout << "choose partition finished\n";
 
 
-        newNode.reset(new Node());
+        newNode = std::make_shared<Node>();
         newNode->level = node->level;
         newNode->count = node->count = 0;
 
@@ -361,6 +482,7 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
 template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_seeds(PartitionVars& parVars)
 {
+        //std::cout << "begin pick seeds\n";
         double area[NMAXNODES+1];
         for (int i = 0; i < parVars.count_total; ++i)
         {
@@ -368,13 +490,15 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_seeds(PartitionVars& pa
                         parVars.branch_buffer[i].radius);
         }
 
+
         int seed0 = -1, seed1 = -1;
         double worst = -parVars.split_area - 1.;
         // for all pairs
         for (int i = 0; i < parVars.count_total-1; ++i)
         {
-                for (int j = i + 1; j < parVars.count_total; ++i)
+                for (int j = i + 1; j < parVars.count_total; ++j)
                 {
+                        //std::cout << "pair " << i << ", " << j << "\n";
                         Geography::GeoCoordinate geo;
                         double radius;
                         Geography::combine_sphere(geo, radius, 
@@ -392,6 +516,8 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_seeds(PartitionVars& pa
                         }
                 }
         }
+
+        //std::cout << "before classify\n";
 
         classify(seed0, 0, parVars);
         classify(seed1, 1, parVars);
