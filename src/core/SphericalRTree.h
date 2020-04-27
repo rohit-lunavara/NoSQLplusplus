@@ -114,6 +114,8 @@ private:
         
         void pick_seeds(PartitionVars& parVars);
 
+        void choose_partition(PartitionVars& parVars, int min_fill);
+
         void classify(int index, int group, PartitionVars& parVars);
 };
 
@@ -236,23 +238,24 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
         partitionVars.split_area = 
                 Geography::spherical_area(partitionVars.split_radius);
 
-        // pick seeds
         pick_seeds(partitionVars);
+        choose_partition(partitionVars, NMINNODES);
 
         node->level = -1;
         node->count = 0;
-
-
         int level = node->level;
-        int count_all = NMAXNODES+1;
-        int min_fill = NMINNODES;
 
-        // choose partition
-        int count_l = 0;
-        int count_r = 0;
-        double area_l = 0.;
-        double area_r = 0.;
+
 }
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
+        PartitionVars& parVars, int min_fill)
+{
+        // TODO
+        while (parVars.branch_count[0])
+}
+
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_seeds(PartitionVars& parVars)
