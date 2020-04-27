@@ -114,7 +114,7 @@ private:
         
         void pick_seeds(PartitionVars& parVars);
 
-        void choose_partition(PartitionVars& parVars, int min_fill);
+        void choose_partition(PartitionVars& parVars);
 
         void classify(int index, int group, PartitionVars& parVars);
 };
@@ -172,6 +172,8 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
 {
         if (node->level > level) // above insertion level
         {
+                // TODO
+                // pick branch
 
         }
         else if (node->level == level) // reach 
@@ -179,7 +181,8 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
                 Branch branch;
                 branch.center = value;
                 branch.storage = key;
-                // 
+                
+                return add_branch(branch, node, newNode);
         }
         else
         {
@@ -196,7 +199,7 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::add_branch(
 {
         if (node->count < NMAXNODES)
         {
-                node->branch[node->count] = branch;
+                node->branches[node->count] = branch;
                 ++(node->count);
                 return false;
         }
@@ -223,8 +226,8 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
         partitionVars.branch_buffer[NMAXNODES] = branch;
 
         // calculate the bound for all branches
-        partitionVars.split_center = partitionVars.branchBuffer[0].center;
-        partitionVars.split_radius = partitionVars.branchBuffer[0].radius;
+        partitionVars.split_center = partitionVars.branch_buffer[0].center;
+        partitionVars.split_radius = partitionVars.branch_buffer[0].radius;
         for (int i = 1; i < NMAXNODES+1; ++i)
         {
                 Geography::combine_sphere(
@@ -239,21 +242,119 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
                 Geography::spherical_area(partitionVars.split_radius);
 
         pick_seeds(partitionVars);
-        choose_partition(partitionVars, NMINNODES);
-
-        node->level = -1;
-        node->count = 0;
-        int level = node->level;
+        choose_partition(partitionVars);
 
 
+        newNode.reset(new Node());
+        newNode->level = node->level;
+        newNode->count = node->count = 0;
+
+        for (int i = 0; i < partitionVars.count_total; ++i)
+        {
+                std::shared_ptr<Node> temp;
+                if (partitionVars.partition[i] == 0)
+                {
+                       
+                        add_branch(partitionVars.branch_buffer[i], node, temp);
+                }
+                else if (partitionVars.partition[i] == 1)
+                {
+                        add_branch(partitionVars.branch_buffer[i], newNode, temp);
+                }
+        }
 }
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
-        PartitionVars& parVars, int min_fill)
+        PartitionVars& parVars)
 {
-        // TODO
-        while (parVars.branch_count[0])
+        int group = -1, chosen = -1, betterGroup = -1;
+
+        while (parVars.branch_count[0] + parVars.branch_count[1] 
+                < parVars.count_total &&
+                parVars.branch_count[0] < parVars.count_total - parVars.min_fill &&
+                parVars.branch_count[1] < parVars.count_total - parVars.min_fill)
+        {
+                double biggestDiff = -1.;
+                for (int i = 0; i < parVars.count_total; ++i)
+                {
+                        if (!parVars.is_taken[i])
+                        {
+                                const auto& center = parVars.branch_buffer[i].center;
+                                double radius = parVars.branch_buffer[i].radius;
+
+                                Geography::GeoCoordinate center0, center1;
+                                double rad0, rad1;
+
+                                using Geography::combine_sphere;
+                                using Geography::spherical_area;
+
+                                combine_sphere(center0, rad0,
+                                        center, radius,
+                                        parVars.branch_center[0],
+                                        parVars.branch_radius[0]);
+                                
+                                combine_sphere(center1, rad1,
+                                        center, radius,
+                                        parVars.branch_center[1],
+                                        parVars.branch_radius[1]);
+                                double growth0 = spherical_area(rad0) - parVars.branch_area[0];
+                                double growth1 = spherical_area(rad1) - parVars.branch_area[1];
+
+                                double diff = growth1 - growth0;
+
+                                if (diff >= 0)
+                                {
+                                        group = 0;
+                                }
+                                else
+                                {
+                                        group = 1;
+                                        diff = -diff;
+                                }
+
+
+                                if(diff > biggestDiff)
+                                {
+                                        biggestDiff = diff;
+                                        chosen = i;
+                                        betterGroup = group;
+                                }
+                                else if((diff == biggestDiff) &&
+                                 (parVars.branch_count[group] 
+                                 < parVars.branch_count[betterGroup]))
+                                {
+                                        chosen = i;
+                                        betterGroup = group;
+                                }
+
+                        }
+                }
+                classify(chosen, betterGroup, parVars);
+        }
+
+        // If one group too full, put remaining rects in the other
+        if((parVars.branch_count[0] + parVars.branch_count[1]) < parVars.count_total)
+        {
+                if(parVars.branch_count[0] >= 
+                        parVars.count_total - parVars.min_fill)
+                {
+                        group = 1;
+                }
+                else
+                {
+                        group = 0;
+                }
+
+                for(int index=0; index< parVars.count_total; ++index)
+                {
+                        if(!parVars.is_taken[index])
+                        {
+                                classify(index, group, parVars);
+                        }
+                }
+        }
+
 }
 
 
@@ -267,7 +368,7 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::pick_seeds(PartitionVars& pa
                         parVars.branch_buffer[i].radius);
         }
 
-        int seed0, seed1;
+        int seed0 = -1, seed1 = -1;
         double worst = -parVars.split_area - 1.;
         // for all pairs
         for (int i = 0; i < parVars.count_total-1; ++i)
@@ -304,7 +405,9 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::classify(
         {
                 throw std::runtime_error("the index is already taken!");
         }
+
         parVars.partition[index] = group;
+        parVars.is_taken[index] = true;
 
         if (parVars.branch_count[group] == 0)
         {
