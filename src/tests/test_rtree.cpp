@@ -99,15 +99,13 @@ int main()
                         ++index;
                 }
 
-                cout << cityname.str() << endl;
-                cout << latitude << endl;
-                cout << longitude << endl;
+                // cout << cityname.str() << endl;
+                // cout << latitude << endl;
+                // cout << longitude << endl;
                 rtree.insert(cityname.str(), {latitude, longitude}, 0.);
         }
-
-
         
-        
+        cout << rtree.search({40.6943,-73.9249}, 100) << "\n";
 
         return 0;
 }

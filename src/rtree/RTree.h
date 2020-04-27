@@ -1572,7 +1572,11 @@ bool RTREE_QUAL::Search(
     {
       if(Overlap(a_rect, &a_node->m_branch[index].m_rect))
       {
-        if(!Search(a_node->m_branch[index].m_child, a_rect, a_foundCount, a_resultCallback, a_context))
+        if(!Search(a_node->m_branch[index].m_child, 
+                a_rect, 
+                a_foundCount, 
+                a_resultCallback, 
+                a_context))
         {
           return false; // Don't continue searching
         }

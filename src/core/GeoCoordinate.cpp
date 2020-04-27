@@ -138,7 +138,7 @@ void combine_sphere(GeoCoordinate& c, double& r,
                 else // cover the full earth
                 {
                         c = c1;
-                        r = numeric_limits<double>::infinity();
+                        r = pi * MEAN_EARTH_RADIUS;
                 }
 
                
@@ -146,7 +146,7 @@ void combine_sphere(GeoCoordinate& c, double& r,
 
         if (r >= pi * MEAN_EARTH_RADIUS)
         {
-                r = numeric_limits<double>::infinity();
+                r = pi * MEAN_EARTH_RADIUS;
         }
 
         // cout << "merge r: " << r << endl;
@@ -158,6 +158,14 @@ double spherical_area(double radius)
         return 4 * pi * MEAN_EARTH_RADIUS * MEAN_EARTH_RADIUS 
                 * sin(0.5 * radius / MEAN_EARTH_RADIUS)
                 * sin(0.5 * radius / MEAN_EARTH_RADIUS);
+}
+
+
+bool overlap(const GeoCoordinate& c1, double r1,
+        const GeoCoordinate& c2, double r2)
+{
+        double dist = distance(c1, c2);
+        return dist <= r1 + r2;
 }
 
 }
