@@ -54,11 +54,17 @@ int main()
         // test2();
         // test3();
         
+        int ncities = 0;
         SphericalRTree<string> rtree;
         cout << "begin" << endl;
         ifstream fin("uscities.txt");
         while (fin)
         {
+                // if (ncities >= 10)
+                // {
+                //         break;
+                // }
+
                 string s;
                 if (!getline(fin, s))
                 {
@@ -103,9 +109,11 @@ int main()
                 // cout << latitude << endl;
                 // cout << longitude << endl;
                 rtree.insert(cityname.str(), {latitude, longitude}, 0.);
+                ++ncities;
         }
         
-        cout << rtree.search({40.6943,-73.9249}, 100) << "\n";
-
+        cout << rtree.search({40.6943,-73.9249}, 10) << "\n";
+        cout << "total us cities: " << ncities << "\n";
+        cout << distance({40.7245,-74.1725}, {40.6943,-73.9249}) << "\n";
         return 0;
 }

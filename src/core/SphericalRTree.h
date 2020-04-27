@@ -60,6 +60,8 @@ private:
                                 partition[i] = -1;
                                 is_taken[i] = false;
                         }
+
+                        branch_count[0] = branch_count[1] = 0;
                 }
         };
 
@@ -175,6 +177,9 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_(
                 node_cover(branch0.center, branch0.radius, root);
                 node_cover(branch1.center, branch1.radius, newNode);
 
+                // std::cout << root->count << "\n";
+                // std::cout << newNode->count << "\n";
+
                 branch0.storage = root;
                 branch1.storage = newNode;
 
@@ -182,7 +187,10 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_(
                 add_branch(branch0, newRoot, temp);
                 add_branch(branch1, newRoot, temp);
 
+                
+
                 root_ = newRoot;
+                
 
                 return true;
         }
@@ -243,7 +251,9 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
 
         if (node->level > level) // above insertion level
         {
+                // std::cout << "level = " << node->level << "\n";
                 int index = pick_branch(value, radius, node);
+                // std::cout << "go to branch " << index << "\n";
                 if (!insert_to_node_recursive_(key, value, radius, 
                         std::get<std::shared_ptr<Node>>(node->branches[index].storage),
                         otherNode, level))
@@ -258,6 +268,7 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
                 }
                 else // child was split
                 {
+                
                         node_cover(node->branches[index].center, 
                                 node->branches[index].radius,
                         std::get<std::shared_ptr<Node>>(node->branches[index].storage));
@@ -271,7 +282,7 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_recursive_(
         }
         else if (node->level == level) // reach 
         {
-                //std::cout << "node = level\n";
+                // std::cout << "reach insertion level\n";
                 Branch branch;
                 branch.center = value;
                 branch.radius = radius;
@@ -300,8 +311,11 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::add_branch(
         }
         else
         {
-                //std::cout << "split node\n";
+                // std::cout << "split node\n";
+                // std::cout << "node count: " << node->count << "\n";
                 split_node(node, branch, newNode);
+                // std::cout << "after split: " << node->count << ", "
+                //         << newNode->count << "\n";
                 return true;
         }
 }
@@ -389,6 +403,10 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::split_node(
                 {
                         add_branch(partitionVars.branch_buffer[i], newNode, temp);
                 }
+                else
+                {
+                        std::cout << "index " << i << "has not been split into a branch\n";
+                }
         }
 }
 
@@ -396,18 +414,25 @@ template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
         PartitionVars& parVars)
 {
+        // std::cout << "choose partition\n";
+        // std::cout << "branch count: " << parVars.branch_count[0] << std::endl;
+        // std::cout << "branch count: " << parVars.branch_count[1] << std::endl;
+        // std::cout << "total count: " << parVars.count_total << std::endl;
+        // std::cout << "min fill: " << parVars.min_fill << std::endl;
+
         while (parVars.branch_count[0] + parVars.branch_count[1] 
                 < parVars.count_total &&
                 parVars.branch_count[0] < parVars.count_total - parVars.min_fill &&
                 parVars.branch_count[1] < parVars.count_total - parVars.min_fill)
         {
+                // std::cout << "loop for one time\n";
                 int group = -1, chosen = -1, betterGroup = -1;
                 double biggestDiff = -1.;
                 for (int i = 0; i < parVars.count_total; ++i)
                 {
                         if (!parVars.is_taken[i])
                         {
-                                std::cout << i << " is not taken\n";
+                                // std::cout << i << " begin to choose\n";
                                 const auto& center = parVars.branch_buffer[i].center;
                                 double radius = parVars.branch_buffer[i].radius;
 
@@ -417,10 +442,10 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
                                 using Geography::combine_sphere;
                                 using Geography::spherical_area;
 
-                                std::cout << parVars.branch_center[0] << std::endl;
-                                std::cout << parVars.branch_radius[0] << std::endl;
-                                std::cout << parVars.branch_center[1] << std::endl;
-                                std::cout << parVars.branch_radius[1] << std::endl;
+                                // std::cout << parVars.branch_center[0] << std::endl;
+                                // std::cout << parVars.branch_radius[0] << std::endl;
+                                // std::cout << parVars.branch_center[1] << std::endl;
+                                // std::cout << parVars.branch_radius[1] << std::endl;
                                 combine_sphere(center0, rad0,
                                         center, radius,
                                         parVars.branch_center[0],
@@ -431,7 +456,7 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
                                         parVars.branch_center[1],
                                         parVars.branch_radius[1]);
                                 
-                                std::cout << "rad0: " << rad0 << ", rad1: " << rad1 << std::endl;
+                                //std::cout << "rad0: " << rad0 << ", rad1: " << rad1 << std::endl;
                                 double growth0 = spherical_area(rad0) - parVars.branch_area[0];
                                 double growth1 = spherical_area(rad1) - parVars.branch_area[1];
 
@@ -447,8 +472,8 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
                                         diff = -diff;
                                 }
 
-                                std::cout << "diff: " << diff << ", biggestdiff: "
-                                        << biggestDiff << std::endl;
+                                // std::cout << "diff: " << diff << ", biggestdiff: "
+                                //        << biggestDiff << std::endl;
                                 if(diff > biggestDiff)
                                 {
                                         biggestDiff = diff;
@@ -467,7 +492,14 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
 
                 if (chosen >= 0)
                 {
+                        // std::cout << "classify: " << chosen << ", " 
+                        //         << betterGroup << "\n";
                         classify(chosen, betterGroup, parVars);
+                }
+                else
+                {
+                        // std::cout << "classify nothing\n";
+                        throw std::runtime_error("nothing chosed, should not happen!");
                 }
                 
         }
@@ -490,6 +522,8 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::choose_partition(
                 {
                         if(!parVars.is_taken[index])
                         {
+                                // std::cout << "classify: " << index << ", " 
+                                // << group << "\n";
                                 classify(index, group, parVars);
                         }
                 }
@@ -553,7 +587,7 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::classify(
 {
         if (parVars.is_taken[index])
         {
-                std::cout << parVars.is_taken[index] << std::endl;
+                // std::cout << parVars.is_taken[index] << std::endl;
                 throw std::runtime_error("the index is already taken!");
         }
 
@@ -596,7 +630,8 @@ int SphericalRTree<KeyType, NMAXNODES, NMINNODES>::search(
         double radius)
 {
         int count_hit = 0;
-        std::cout << "root level: " << root_->level << std::endl;
+        // std::cout << "root level: " << root_->level << std::endl;
+        // std::cout << "root count: " << root_->count << "\n";
         search_(root_, count_hit, value, radius);
         return count_hit;
 }
