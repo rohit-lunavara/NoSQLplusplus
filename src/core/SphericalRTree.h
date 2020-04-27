@@ -310,8 +310,16 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::classify(
         }
         else
         {
-
+                Geography::combine_sphere(
+                        parVars.branch_center[group],
+                        parVars.branch_radius[group],
+                        parVars.branch_center[group],
+                        parVars.branch_radius[group], 
+                        parVars.branch_buffer[index].center,
+                        parVars.branch_buffer[index].radius);     
         }
+        parVars.branch_area[group] = Geography::spherical_area(parVars.branch_radius[group]);
+        ++parVars.branch_count[group];
 }
 
 template <class KeyType, int NMAXNODES, int NMINNODES>

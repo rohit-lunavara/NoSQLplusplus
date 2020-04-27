@@ -73,14 +73,17 @@ double distance(const GeoCoordinate& coord1, const GeoCoordinate& coord2)
 
 
 void combine_sphere(GeoCoordinate& c, double& r,
-        const GeoCoordinate& c1, double r1,
-        const GeoCoordinate& c2, double r2)
+        GeoCoordinate c1, double r1,
+        GeoCoordinate c2, double r2)
 {
         double dist = distance(c1, c2);
 
         if (dist + r1 <= r2) // sphere 1 is in sphere 2
         {
                 c = c2;
+                cout << c << endl;
+                cout << c1 << endl;
+                
                 r = r2;
         }
         else if (dist + r2 <= r1) // sphere 2 is in sphere 1
@@ -120,7 +123,7 @@ void combine_sphere(GeoCoordinate& c, double& r,
 
                 double norm = sqrt(x*x + y*y + z*z);
 
-                cout << "norm: " << norm << endl;
+                // cout << "norm: " << norm << endl;
                 if (fabs(norm) > 1e-12)
                 {
                         double theta = acos(z / norm);
