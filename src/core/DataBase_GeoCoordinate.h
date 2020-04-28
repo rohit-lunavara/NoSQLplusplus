@@ -10,10 +10,19 @@ private:
         RTree::SphericalRTree<std::string> rtree_;
         HashTable<std::string, Geography::GeoCoordinate> table_;
 public:
-        const Geography::GeoCoordinate& get(const std::string& key);
-        bool set(const std::string& key, const Geography::GeoCoordinate& value...);
-        bool del(const std::string& key);
+        Geography::GeoCoordinate get(const std::string& key);
+
+        bool set(const std::string& key, const Geography::GeoCoordinate& value,
+                std::initializer_list<std::string> options);
+        
+        bool remove(const std::string& key);
+        bool rename(const std::string& key, const std::string& newkey);
+
+        Geography::GeoCoordinate getset(const std::string& key, const Geography::GeoCoordinate& value,
+                std::initializer_list<std::string> options);
+        
         double distance(const std::string& key1, const std::string& key2);
+        
         std::set<std::string> radius(const std::string& key, double rad);
 };
 
@@ -21,7 +30,8 @@ public:
 // O (logN)
 bool DataBase<std::string, Geography::GeoCoordinate>::set(
         const std::string& key, 
-        const Geography::GeoCoordinate& value...)
+        const Geography::GeoCoordinate& value, 
+        std::initializer_list<std::string> options)
 {
         rtree_.insert(key, value, 0.);
         table_[key] = value;
@@ -29,14 +39,14 @@ bool DataBase<std::string, Geography::GeoCoordinate>::set(
 }
 
 // O (1)
-const Geography::GeoCoordinate&
+Geography::GeoCoordinate
 DataBase<std::string, Geography::GeoCoordinate>::get(const std::string& key)
 {
         return table_[key];
 }
 
 // O (N)
-bool DataBase<std::string, Geography::GeoCoordinate>::del(const std::string& key)
+bool DataBase<std::string, Geography::GeoCoordinate>::remove(const std::string& key)
 {
         rtree_.remove(key, table_[key], 0.001);
         table_.erase(key);

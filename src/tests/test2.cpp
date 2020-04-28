@@ -6,23 +6,12 @@
 
 using namespace std;
 
-void test1()
-{
-	DataBase<string, string> db;
-	cout << db.set("hello", "world", 'n') << '\n';
-	cout << db.set("hello", "new", 'n') << '\n';
-	cout << db.get("hello") << '\n';
-
-	// this does not compile because distance is not declared for string
-	// cout << db.distance("hello", "hello") << '\n';
-}
-
 void test2()
 {
 	using namespace Geography;
 	DataBase<string, GeoCoordinate> db;
-	cout << db.set("New York", {40.7128_N, 74.0060_E}) << '\n';
-	cout << db.set("London", {51.5074_N, 0.1278_W}) << '\n';
+	cout << db.set("New York", {40.7128_N, 74.0060_E}, {}) << '\n';
+	cout << db.set("London", {51.5074_N, 0.1278_W}, {}) << '\n';
 
 	cout << db.get("New York") << '\n';
 	cout << db.get("London") << '\n';
@@ -79,7 +68,7 @@ void test3()
                         ++index;
                 }
 
-                db.set(cityname.str(), {latitude, longitude});
+                db.set(cityname.str(), {latitude, longitude}, { });
                 ++ncities;
         }
 
@@ -91,7 +80,7 @@ void test3()
                 cout << r << "\n";
         }
 
-        db.del("Union City, NJ");
+        db.remove("Union City, NJ");
 
         
         set<string> results2 = db.radius("New York, NY", 15.);

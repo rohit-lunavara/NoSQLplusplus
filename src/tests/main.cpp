@@ -1,17 +1,27 @@
 #include <iostream>
 #include <unordered_map>
-#include "Redis.h"
+#include "Database.h"
+
 
 int main() {
-	Redis redis ;
-	std::unordered_map<std::string, uint64_t> options {
-		{"NX", 1}
-	} ;
-	std::cout << redis.set("hello", "world", options) << "\n" ;
-	std::cout << redis.set("hello", "change", options) << "\n" ;
-	std::cout << redis.get("hello") << "\n" ;
-	std::cout << redis.getrange("hello", 1, 3) << "\n" ;
-	std::cout << redis.getset("new", "thing") << "\n" ;
-	std::cout << redis.get("new") << "\n" ;
+	DataBase<std::string, std::string> redis ;
+
+	// std::cout << redis.set("hello", "world") << "\n" ;
+	// std::cout << redis.append("new", "hey") << "\n" ;
+	// std::cout << redis.append("new", "hey") << "\n" ;
+	// std::cout << redis.get("hello") << "\n" ;
+	// std::cout << redis.get("no") << "\n" ;
+	// std::cout << redis.get("new") << "\n" ;
+	// std::cout << redis.getrange("new", 2, 4) << "\n" ;
+	// std::cout << redis.getrange("new", -4, 4) << "\n" ;
+	// std::cout << redis.getrange("new", -3, -1) << "\n" ;
+	// std::cout << redis.setrange("new", 8, " world") << "\n" ;
+	// std::cout << redis.setrange("new", 30, " world") << "\n" ;
+	// std::cout << redis.get("new") << "\n" ;
+	// std::cout << redis.setrange("new_set", 5, "world") << "\n" ;
+	// std::cout << redis.get("new_set") << "\n" ;	
+	// std::cout << redis.strlen("new") << "\n" ;
+	// std::cout << redis.strlen("new_set") << "\n" ;
+
 	return 0 ;
 }
