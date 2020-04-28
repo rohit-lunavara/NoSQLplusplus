@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <set>
 #include <unordered_map>
 #include "SphericalRTree.h"
 #include "GeoCoordinate.h"
@@ -261,25 +262,19 @@ void test6()
 
         cout << "search result=======================\n";
         cout << "cities: " << rtree.search({47.9038_N, 121.986_W}, 50000.) << endl;
-
         int rmcities = 0;
         for (const auto& x : records)
         {
                 if (rmcities >= 20000) break;
-                try {
-                        rtree.remove(x.first, x.second, 0.);
-                } catch (const exception& e)
-                {
-                        cout << x.first << endl;
-                        cout << e.what() << endl;
-                }
-
+                rtree.remove(x.first, x.second, 1.);
                 ++rmcities;
-               
         }
-        rtree.print_tree();
+
+        // rtree.print_tree();
         cout << "search result=======================\n";
-        cout << "cities: " << rtree.search({47.9038_N, 121.986_W}, 50000.) << endl;     
+        set<string> results;
+        rtree.search({47.9038_N, 121.986_W}, 50000., &results);
+        cout << results.size() << endl;
 }
 
 int main()

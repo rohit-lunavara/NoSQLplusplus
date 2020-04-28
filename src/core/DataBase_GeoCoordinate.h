@@ -1,6 +1,7 @@
 #include "HashTable.h"
 #include "GeoCoordinate.h"
 #include "SphericalRTree.h"
+#include <set>
 
 template <>
 class DataBase<std::string, Geography::GeoCoordinate>
@@ -13,6 +14,7 @@ public:
         bool set(const std::string& key, const Geography::GeoCoordinate& value...);
         bool del(const std::string& key);
         double distance(const std::string& key1, const std::string& key2);
+        int radius(std::set<std::string>& results, const std::string& key, double rad);
 };
 
 bool DataBase<std::string, Geography::GeoCoordinate>::set(
@@ -44,4 +46,13 @@ double DataBase<std::string, Geography::GeoCoordinate>::distance(
     const auto& geo1 = internalStorage_[key1];
     const auto& geo2 = internalStorage_[key2];
     return Geography::distance(geo1, geo2);
+}
+
+
+int DataBase<std::string, Geography::GeoCoordinate>::radius(
+        std::set<std::string>& results, 
+        const std::string& key, 
+        double rad)
+{
+        
 }
