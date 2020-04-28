@@ -23,3 +23,4 @@ add_executable(
 
 target_link_libraries (test3 nosql++)
 set_target_properties(test3 PROPERTIES LINKER_LANGUAGE CXX)
+
