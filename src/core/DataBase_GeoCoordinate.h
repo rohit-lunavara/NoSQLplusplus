@@ -14,7 +14,7 @@ public:
         bool set(const std::string& key, const Geography::GeoCoordinate& value...);
         bool del(const std::string& key);
         double distance(const std::string& key1, const std::string& key2);
-        int radius(std::set<std::string>& results, const std::string& key, double rad);
+        std::set<std::string> radius(const std::string& key, double rad);
 };
 
 
@@ -55,13 +55,11 @@ double DataBase<std::string, Geography::GeoCoordinate>::distance(
 
 
 // O (logN)
-int DataBase<std::string, Geography::GeoCoordinate>::radius(
-        std::set<std::string>& results, 
+std::set<std::string> DataBase<std::string, Geography::GeoCoordinate>::radius(
         const std::string& key, 
         double rad)
 {
-        // std::cout << table_[key] << "\n";
+        std::set<std::string> results;
         rtree_.search(table_[key], rad, &results);
-        
-        return results.size();
+        return results;
 }

@@ -4,12 +4,12 @@ template <class KeyType, class ValueType>
 class DataBase
 {
 public:
-    const ValueType& get(const KeyType& key);
-	bool set(const KeyType& key, const ValueType& value...);
-    bool del(const KeyType& key);
-    bool rename(const KeyType& key);
-    bool exist(const KeyType& key);
-    const KeyType& random();
+        const ValueType& get(const KeyType& key);
+        bool set(const KeyType& key, const ValueType& value...);
+        bool del(const KeyType& key);
+        bool rename(const KeyType& key);
+        bool exist(const KeyType& key);
+        const KeyType& random();
 };
 
 template <class KeyType, class ValueType>

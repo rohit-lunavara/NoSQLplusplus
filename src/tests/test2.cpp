@@ -83,16 +83,19 @@ void test3()
                 ++ncities;
         }
 
-        set<string> results;
-        db.radius(results, "New York, NY", 15.);
+        
+        set<string> results = db.radius("New York, NY", 15.);
+        cout << "search result=======================\n";
         for (const auto& r : results)
         {
                 cout << r << "\n";
         }
 
         db.del("Union City, NJ");
-        set<string> results2;
-        db.radius(results2, "New York, NY", 15.);
+
+        
+        set<string> results2 = db.radius("New York, NY", 15.);
+        cout << "search result=======================\n";
         for (const auto& r : results2)
         {
                 cout << r << "\n";
