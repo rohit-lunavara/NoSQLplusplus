@@ -33,7 +33,7 @@ void test2()
 
 int main()
 {
-	test1();
+	// test1();
 	test2();
 	// this does not compile
 	// DataBase<int, int> db;

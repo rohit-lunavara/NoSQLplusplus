@@ -1,6 +1,18 @@
+// AUTHORS
+// this code is rewritten based on historical codes
+// 	* 1983 Original algorithm and test code by Antonin Guttman and Michael Stonebraker, UC Berkely
+// 	* 1994 ANCI C ported from original test code by Melinda Green - melinda@superliminal.com
+// 	* 1995 Sphere volume fix for degeneracy problem submitted by Paul Brook
+// 	* 2004 Templated C++ port by Greg Douglas
+//      * 2020  (1) change to adapt spheres on spherical surface (for geographical data)
+//              (2) rewrite using modern C++, make it gnu c compilable
+//              (3) fix some bugs 
+//              by Ziwei Zhu - zz2556@columbia.edu
+
 #pragma once
 
 #include <array>
+#include <vector>
 #include <variant>
 #include <memory>
 #include <stdexcept>
@@ -9,6 +21,7 @@
 
 namespace RTree
 {
+
 
 template <class KeyType, int NMAXNODES = 8, int NMINNODES = NMAXNODES / 2>
 class SphericalRTree
@@ -74,15 +87,19 @@ public:
                 const KeyType& key, 
                 const Geography::GeoCoordinate& value, 
                 double radius);
+        
         void remove(
-                const KeyType& key, 
-                const Geography::GeoCoordinate& value, 
+                const KeyType& key,
+                const Geography::GeoCoordinate& value,
                 double radius);
+        
         int search(
                 const Geography::GeoCoordinate& value, 
                 double radius);
         
         void remove_all();
+
+        void print_tree();
 
 private:
         bool insert_to_node_(
@@ -100,10 +117,6 @@ private:
                 std::shared_ptr<Node>& newNode,
                 int level);
         
-        // Add a branch to a node.  Split the node if necessary.
-        // Returns 0 if node not split.  Old node updated.
-        // Returns 1 if node split, sets *new_node to address of new node.
-        // Old node updated, becomes one of two.
         bool add_branch(
                 const Branch& branch,
                 std::shared_ptr<Node> node,
@@ -131,6 +144,21 @@ private:
                 int& count_hit,
                 const Geography::GeoCoordinate& value,
                 double radius);
+        
+        void remove_(const KeyType& key,
+                const Geography::GeoCoordinate& value,
+                double radius,
+                std::shared_ptr<Node> node);
+        
+        bool remove_recursive_(const KeyType& key,
+                const Geography::GeoCoordinate& value,
+                double radius,
+                std::shared_ptr<Node> node,
+                std::vector<std::shared_ptr<Node>>& reinsert_list);
+
+        void disconnect_branch(std::shared_ptr<Node> node, int index);
+
+        void print_node(std::shared_ptr<Node> node);
 };
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
@@ -177,8 +205,8 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_(
                 node_cover(branch0.center, branch0.radius, root);
                 node_cover(branch1.center, branch1.radius, newNode);
 
-                // std::cout << root->count << "\n";
-                // std::cout << newNode->count << "\n";
+                //std::cout << root->count << "\n";
+                //std::cout << newNode->count << "\n";
 
                 branch0.storage = root;
                 branch1.storage = newNode;
@@ -186,12 +214,7 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::insert_to_node_(
                 std::shared_ptr<Node> temp;
                 add_branch(branch0, newRoot, temp);
                 add_branch(branch1, newRoot, temp);
-
-                
-
                 root_ = newRoot;
-                
-
                 return true;
         }
 
@@ -619,10 +642,119 @@ void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::remove(
         const Geography::GeoCoordinate& value, 
         double radius)
 {
-
+        // std::cout << "remove key " << key << std::endl;
+        remove_(key, value, radius, root_);
 }
 
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::remove_(const KeyType& key,
+        const Geography::GeoCoordinate& value,
+        double radius,
+        std::shared_ptr<Node> node)
+{
+        std::vector<std::shared_ptr<Node>> reinsert_list;
+        if (!remove_recursive_(key, value, radius, node, reinsert_list))
+        { // find something to be deleted
+                //std::cout << "begin to reinsert\n";
+                for (const auto& temp : reinsert_list)
+                {
+                       // std::cout << "node->count: " << temp->count << std::endl;
 
+                        for (int i = 0; i < temp->count; ++i)
+                        {
+                                const KeyType& key = std::get<KeyType>(temp->branches[i].storage);
+                                //std::cout << "reinsert key " << key << std::endl;
+                                //std::cout << "center: " << temp->branches[i].center << "\n";
+                                //std::cout << "radius: " << temp->branches[i].radius << "\n";
+
+                                //std::cout << "root count: " << root_->count << "\n";
+                                //std::cout << "root level: " << root_->level << "\n";
+                                //std::cout << "temp level: " << temp->level << "\n";
+
+                                if (root_->count == 0 && root_->level > 0)
+                                {
+                                        root_->level = 0;
+                                }
+                                
+                                insert_to_node_(
+                                       key,
+                                       temp->branches[i].center,
+                                       temp->branches[i].radius,
+                                       root_, temp->level);
+                                //std::cout << "insert finish\n";
+                        }
+                }
+        }
+}
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::remove_recursive_(
+        const KeyType& key,
+        const Geography::GeoCoordinate& value,
+        double radius,
+        std::shared_ptr<Node> node,
+        std::vector<std::shared_ptr<Node>>& reinsert_list)
+{
+        if (node->is_internal())
+        {
+                for (int i = 0; i < node->count; ++i)
+                {
+                        if (overlap(value, radius, node->branches[i].center,
+                                node->branches[i].radius))
+                        {
+                                auto curNode = std::get<std::shared_ptr<Node>>(
+                                        node->branches[i].storage);
+                                if (!remove_recursive_(
+                                        key, value, radius, curNode, reinsert_list))
+                                {
+                                        if (curNode->count >= NMINNODES)
+                                        {
+                                                node_cover(node->branches[i].center,
+                                                        node->branches[i].radius,
+                                                        curNode);
+                                        }
+                                        else
+                                        {
+                                                //std::cout << "cur count: " << curNode->count << std::endl;
+
+                                                // if (curNode->level != 0)
+                                                // {
+                                                //         throw std::runtime_error("current <min node is not above leaf");
+                                                // }
+                                                // not enough branch in this nodes
+                                                reinsert_list.push_back(curNode);
+                                                //std::cout << "node count: " << node->count << "\n";
+                                                disconnect_branch(node, i);
+                                                //std::cout << "disconnect finished!\n";
+                                        }
+                                        return false;
+                                }
+                        }
+                }
+                return true;
+        }
+        else // leaf
+        {
+                for (int i = 0; i < node->count; ++i)
+                {
+                        if (std::get<KeyType>(node->branches[i].storage) == key)
+                        {
+                                disconnect_branch(node, i);
+                                return false;
+                        }
+                }
+                return true;
+        }
+}
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::disconnect_branch(
+        std::shared_ptr<Node> node, int index)
+{
+        node->branches[index] = node->branches[node->count - 1];
+        --(node->count);
+        
+}
 
 template <class KeyType, int NMAXNODES, int NMINNODES>
 int SphericalRTree<KeyType, NMAXNODES, NMINNODES>::search(
@@ -676,7 +808,7 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::search_(
                                 const KeyType& key = 
                                         std::get<KeyType>(
                                                 node->branches[i].storage);
-                                std::cout << "key: " << key << std::endl;
+                                // std::cout << "key: " << key << std::endl;
                                 ++count_hit;  
                         }
                 }
@@ -689,8 +821,35 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::search_(
 template <class KeyType, int NMAXNODES, int NMINNODES>
 void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::remove_all()
 {
-
+        root_ = std::make_shared<Node>();
+        root_->count = 0;
+        root_->level = 0;
 }
 
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::print_tree()
+{
+        print_node(root_);
+}
+
+template <class KeyType, int NMAXNODES, int NMINNODES>
+void SphericalRTree<KeyType, NMAXNODES, NMINNODES>::print_node(
+        std::shared_ptr<Node> node)
+{
+        if (node->is_internal())
+        {
+                std::cout << "level = " << node->level << std::endl;
+                for (int i = 0; i < node->count; ++i)
+                {
+                        print_node(std::get<std::shared_ptr<Node>>(
+                                node->branches[i].storage));
+                }
+                std::cout << "back to level " << node->level << std::endl;
+        }
+        else
+        {
+                std::cout << "leaf: " << node->count << std::endl;
+        }
+}
 
 }
