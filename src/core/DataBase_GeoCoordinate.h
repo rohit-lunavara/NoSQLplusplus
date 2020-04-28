@@ -7,8 +7,8 @@ template <>
 class DataBase<std::string, Geography::GeoCoordinate>
 {
 private:
-	HashTable<std::string, Geography::GeoCoordinate> internalStorage_;
         RTree::SphericalRTree<std::string> rtree_;
+        HashTable<std::string, Geography::GeoCoordinate> table_;
 public:
         const Geography::GeoCoordinate& get(const std::string& key);
         bool set(const std::string& key, const Geography::GeoCoordinate& value...);
@@ -17,42 +17,51 @@ public:
         int radius(std::set<std::string>& results, const std::string& key, double rad);
 };
 
+
+// O (logN)
 bool DataBase<std::string, Geography::GeoCoordinate>::set(
         const std::string& key, 
         const Geography::GeoCoordinate& value...)
 {
-        internalStorage_[key] = value;
         rtree_.insert(key, value, 0.);
+        table_[key] = value;
         return true;
 }
 
-
+// O (1)
 const Geography::GeoCoordinate&
 DataBase<std::string, Geography::GeoCoordinate>::get(const std::string& key)
 {
-        return internalStorage_[key];
+        return table_[key];
 }
 
+// O (N)
 bool DataBase<std::string, Geography::GeoCoordinate>::del(const std::string& key)
 {
-        rtree_.remove(key, internalStorage_[key], 0.);
-        internalStorage_.erase(key);
+        rtree_.remove(key, table_[key], 0.001);
+        table_.erase(key);
+        return true;
 }
 
+// O (1)
 double DataBase<std::string, Geography::GeoCoordinate>::distance(
     const std::string& key1, 
     const std::string& key2)
 {
-    const auto& geo1 = internalStorage_[key1];
-    const auto& geo2 = internalStorage_[key2];
+    const auto& geo1 = table_[key1];
+    const auto& geo2 = table_[key2];
     return Geography::distance(geo1, geo2);
 }
 
 
+// O (logN)
 int DataBase<std::string, Geography::GeoCoordinate>::radius(
         std::set<std::string>& results, 
         const std::string& key, 
         double rad)
 {
+        // std::cout << table_[key] << "\n";
+        rtree_.search(table_[key], rad, &results);
         
+        return results.size();
 }

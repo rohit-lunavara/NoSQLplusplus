@@ -937,11 +937,11 @@ bool SphericalRTree<KeyType, NMAXNODES, NMINNODES>::search_(
                                 const KeyType& key = 
                                         std::get<KeyType>(
                                                 node->branches[i].storage);
-                                // std::cout << "key: " << key << std::endl;
-                                if (results != nullptr)
-                                {
-                                        results->insert(key);
-                                }
+                                std::cout << "key: " << key << std::endl;
+                                // if (results != nullptr)
+                                // {
+                                //         results->insert(key);
+                                // }
                                 ++count_hit;  
                         }
                 }

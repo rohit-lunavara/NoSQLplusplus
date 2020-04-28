@@ -266,7 +266,7 @@ void test6()
         for (const auto& x : records)
         {
                 if (rmcities >= 20000) break;
-                rtree.remove(x.first, x.second, 1.);
+                rtree.remove(x.first, x.second, 0.001);
                 ++rmcities;
         }
 

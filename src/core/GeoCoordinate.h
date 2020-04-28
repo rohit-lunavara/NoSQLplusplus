@@ -6,6 +6,7 @@ namespace Geography {
 
 constexpr double MEAN_EARTH_RADIUS = 6371.; // km
 constexpr double pi = 3.1415926535897932;
+constexpr double MAX_SPHERICAL_RADIUS = pi * MEAN_EARTH_RADIUS;
 
 constexpr long double operator"" _N (long double latitude)
 {
