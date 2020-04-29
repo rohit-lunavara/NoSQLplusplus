@@ -9,8 +9,6 @@
 //
 
 #include "DataBase_List.h"
-#include <iostream>
-
 
 using namespace std;
 
@@ -76,22 +74,41 @@ string DataBase<string, deque<string>>::rpop(string key) {
 }
 
 bool DataBase<string, deque<string>>::set(const string& key, const string& value, initializer_list<string> options){
-//    if(options.size() == 2 && options[0] == 'x'){
-//        if(options[1] == 'l'){
-//            return lpushx(key, value);
-//        }
-//        else if(options[1] == 'r'){
-//            return rpushx(key, value);
-//        }
-//    }
-//    if(list.count == 1){
-//        if(options[1] == 'l'){
-//            return lpush(key, value);
-//        }
-//        else if(options[1] == 'r'){
-//            return rpush(key, value);
-//        }
-//    }
+    for ( auto& option : options ) {
+        std::for_each(option.begin(), option.end(), ::toupper);
+    }
+    initializer_list<string>::iterator it=options.begin();
+    if(options.size() == 2){
+        if(*it == "X"){
+            it++;
+            if(*it == "R"){
+                return rpushx(key, value);
+            }
+            else if(*it == "L"){
+                return lpushx(key, value);
+            }
+        }
+        else if(*it == "R"){
+            it++;
+            if(*it == "X"){
+                return rpushx(key, value);
+            }
+        }
+        else if(*it == "L"){
+            it++;
+            if(*it == "X"){
+                return lpushx(key, value);
+            }
+        }
+    }
+    else if(options.size() == 1){
+        if(*it == "R"){
+            return rpush(key, value);
+        }
+        else if(*it == "L"){
+            return lpush(key, value);
+        }
+    }
     return false;
 }
 

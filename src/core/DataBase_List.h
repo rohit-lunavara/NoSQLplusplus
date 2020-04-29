@@ -1,15 +1,18 @@
-//
-//  List.h
-//  List
-//
-//  Created by Conor Sweeney on 4/21/20.
-//  Copyright © 2020 csweeney. All rights reserved.
-//
+#pragma once
 
+// DEBUG
+#include <iostream>
+
+//DATA STRUCTURES
 #include <string>
 #include <deque>
 #include <vector>
 #include <unordered_map>
+
+// OPTIONS
+#include <initializer_list>
+
+//Base
 #include "DataBase.h"
 
 template<>
