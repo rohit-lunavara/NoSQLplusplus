@@ -24,3 +24,10 @@ add_executable(
 target_link_libraries (test3 nosql++)
 set_target_properties(test3 PROPERTIES LINKER_LANGUAGE CXX)
 
+add_executable(
+    test4
+    test1_string.cpp
+)
+
+target_link_libraries (test4 nosql++)
+set_target_properties(test4 PROPERTIES LINKER_LANGUAGE CXX)

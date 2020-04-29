@@ -61,4 +61,3 @@ bool DataBase<KeyType, ValueType>::exist(const KeyType& key)
 #include "DataBase_GeoCoordinate.h"
 #include "DataBase_String.h"
 // #include "DataBase_list.h"
-
