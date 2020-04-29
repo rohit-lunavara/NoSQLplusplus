@@ -1,3 +1,5 @@
+// TODO need to copy to header file
+
 //
 //  List.cpp
 //  List
@@ -6,7 +8,7 @@
 //  Copyright © 2020 csweeney. All rights reserved.
 //
 
-#include "List.h"
+#include "Database_List.h"
 #include <iostream>
 
 

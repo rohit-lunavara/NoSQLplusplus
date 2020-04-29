@@ -1,6 +1,7 @@
-#include "Database_String.h"
+// #include "Database_String.h"
 
-
+// TODO move it to header
+/*
 // Refactor to include options
 std::string Database_String::set(const std::string& k, const std::string& v) {
 	r_strings_[k] = v ;
@@ -89,6 +90,7 @@ int32_t Database_String::setrange(const std::string& k, uint32_t offset, const s
 int32_t Database_String::strlen(const std::string& k) {
 	return Database_String::get(k).size() ;
 }
+*/
 
 
 

@@ -11,29 +11,61 @@
 #include <vector>
 #include <unordered_map>
 
+
 using namespace std;
 
+// TODO need to change to 
+// template<>
+// class DataBase<std::string, std::deque<string>>
 class List {
 public:
     List();
+
+    // TODO
+    bool exist(const std::string& key);
+
+    
+    // TODO
+    std::deque<std::string> get(const std::string& key);
+
+    // TODO
+    bool remove(const std::string& key);
+
+    // TODO
+    bool rename(const std::string& key, const std::string& newkey);
+
+    
     //Removes and returns the first element of the list stored at key.
     string lpop(string key);
     
     //Removes and returns the last element of the list stored at key.
     string rpop(string key);
     
+    
+    // set(k, v, {'l'}) -> lpush
+    // set(k, v, {'r'}) -> rpush
+    // set(k, v, {'x', 'l'}) -> lpushx
+    // set(k, v, {'x', 'r'}) -> rpushx
+    // TODO
+    bool set(const std::string& key, const string& value, 
+        std::initializer_list<std::string> options);
+
+    // TODO make it private
     //Inserts the value at the head of the list. If a list does not exist for a key then the list is created.
     //Returns the size of the list.
     int lpush(string key, string value);
     
+    // TODO make it private
     //Inserts the value at the tail of the list. If a list does not exist for a key then the list is created.
     //Returns the size of the list.
     int rpush(string key, string value);
-    
+
+    // TODO make it private    
     //Inserts the value at the head of the list only if a list already exists. If a list does not exist then it is ignored.
     //Returns the size of the list.
     int lpushx(string key, string value);
-    
+
+    // TODO make it private   
     //Inserts the value at the tail of the list only if a list already exists. If a list does not exist then it is ignored.
     //Returns the size of the list.
     int rpushx(string key, string value);
