@@ -11,29 +11,28 @@
 #include <vector>
 #include <unordered_map>
 
-
 using namespace std;
 
-// TODO need to change to 
-// template<>
-// class DataBase<std::string, std::deque<string>>
-class List {
+template<>
+class DataBase<string, deque<string>> {
 public:
-    List();
+    DataBase<string, deque<string>>();
 
-    // TODO
-    bool exist(const std::string& key);
+    // Returns if a list key exists in the database.
+    bool exist(const string& key);
 
-    
-    // TODO
-    std::deque<std::string> get(const std::string& key);
+    // Returns the deque list for the given key.
+    // Throws an error if the key does not exist.
+    deque<string> get(const string& key);
 
-    // TODO
-    bool remove(const std::string& key);
+    // Removes a list from the database.
+    // Returns true if the key is in the list and successfully removed.
+    bool remove(const string& key);
 
-    // TODO
-    bool rename(const std::string& key, const std::string& newkey);
-
+    // Renames a list in the database.
+    // Returns false if the key does not exist or the newkey already exists.
+    // Returns true for a successful rename.
+    bool rename(const string& key, const string& newkey);
     
     //Removes and returns the first element of the list stored at key.
     string lpop(string key);
@@ -41,34 +40,36 @@ public:
     //Removes and returns the last element of the list stored at key.
     string rpop(string key);
     
-    
+    // Pushes a value to the list at the key.
+    // initialzer list options are as follows:
     // set(k, v, {'l'}) -> lpush
     // set(k, v, {'r'}) -> rpush
     // set(k, v, {'x', 'l'}) -> lpushx
     // set(k, v, {'x', 'r'}) -> rpushx
-    // TODO
-    bool set(const std::string& key, const string& value, 
-        std::initializer_list<std::string> options);
+    // x must always be the first option followed by a direction
+    // Invalid options will always return a false.
+    // Returns if the value is successfully added to the key.
+    bool set(const std::string& key, const string& value, initializer_list<string> options);
 
     // TODO make it private
     //Inserts the value at the head of the list. If a list does not exist for a key then the list is created.
     //Returns the size of the list.
-    int lpush(string key, string value);
+    private int lpush(string key, string value);
     
     // TODO make it private
     //Inserts the value at the tail of the list. If a list does not exist for a key then the list is created.
     //Returns the size of the list.
-    int rpush(string key, string value);
+    private int rpush(string key, string value);
 
     // TODO make it private    
     //Inserts the value at the head of the list only if a list already exists. If a list does not exist then it is ignored.
     //Returns the size of the list.
-    int lpushx(string key, string value);
+    private int lpushx(string key, string value);
 
     // TODO make it private   
     //Inserts the value at the tail of the list only if a list already exists. If a list does not exist then it is ignored.
     //Returns the size of the list.
-    int rpushx(string key, string value);
+    private int rpushx(string key, string value);
     
     //Inserts the value at at the index before or after the pivot parameter.
     //Returns the size of the list.
