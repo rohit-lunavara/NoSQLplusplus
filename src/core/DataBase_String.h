@@ -57,8 +57,8 @@ private :
 // Find a better option compared to exceptions for missing values
 class NonStringValueException : public std::exception {
 public :
-	NonStringValueException() ;
-	~NonStringValueException() ;
+	NonStringValueException() = default;
+	~NonStringValueException() = default;
 	virtual const char* what() const noexcept {
 		return "ERROR : Expected string value.\n" ;
 	}
@@ -96,7 +96,7 @@ bool DataBase<std::string, std::string>::set(
 std::string DataBase<std::string, std::string>::get(const std::string& k) {
 	auto k_str = r_strings_.find(k) ;
 	if ( k_str == r_strings_.end() ) {
-		throw ValueNotFoundException() ;
+		throw ValueNotFoundException();
 	}
 	return k_str->second ;
 }
