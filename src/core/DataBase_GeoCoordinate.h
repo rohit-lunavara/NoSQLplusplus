@@ -96,7 +96,7 @@ double DataBase<std::string, Geography::GeoCoordinate>::distance(
 {
         if (!exist(key1) || !exist(key2))
         {
-                throw ValueNotFoundException();
+                return -1.;
         }
 
         const auto& geo1 = table_[key1];
@@ -110,12 +110,12 @@ std::set<std::string> DataBase<std::string, Geography::GeoCoordinate>::radius(
         const std::string& key, 
         double rad)
 {
+        std::set<std::string> results;
         if (!exist(key))
         {
-                throw ValueNotFoundException();
+               return results;
         }
 
-        std::set<std::string> results;
         rtree_.search(table_[key], rad, &results);
         return results;
 }
