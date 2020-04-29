@@ -8,20 +8,23 @@
 //  Copyright © 2020 csweeney. All rights reserved.
 //
 
-#include "Database_List.h"
+#include "DataBase_List.h"
+#include "DataBase.h"
 #include <iostream>
 
 
 using namespace std;
 
-DataBase<string, deque<string>>::DataBase<string, deque<string>>(){
+template<>
+DataBase<string, deque<string>>::DataBase(){
 }
 
+template<>
 bool DataBase<string, deque<string>>::exist(const string& key) {
     return (m.count(key) == 1);
 }
 
-   
+template<>
 deque<string> DataBase<string, deque<string>>::get(const string& key){
     if(!exist(key)){
         throw "get: key does not exist in the list.";
@@ -29,6 +32,7 @@ deque<string> DataBase<string, deque<string>>::get(const string& key){
     return m[key];
 }
 
+template<>
 bool DataBase<string, deque<string>>::remove(const string& key){
     if(!exist(key)){
         return false;
@@ -37,6 +41,7 @@ bool DataBase<string, deque<string>>::remove(const string& key){
     return true;
 }
 
+template<>
 bool DataBase<string, deque<string>>::rename(const string& key, const string& newkey){
     if(exist(newkey) || !exist(newkey)){
         return false;
@@ -47,7 +52,7 @@ bool DataBase<string, deque<string>>::rename(const string& key, const string& ne
     return true;
 }
 
-
+template<>
 string DataBase<string, deque<string>>::lpop(string key) {
     if(m.count(key) == 1) {
         throw "lpop: key does not exist in the list.";
@@ -64,6 +69,7 @@ string DataBase<string, deque<string>>::lpop(string key) {
     return s;
 }
 
+template<>
 string DataBase<string, deque<string>>::rpop(string key) {
     if(m.count(key) == 1) {
         throw "rpop: key does not exist in the list.";
@@ -80,6 +86,7 @@ string DataBase<string, deque<string>>::rpop(string key) {
     return s;
 }
 
+template<>
 bool DataBase<string, deque<string>>::set(const string& key, const string& value, initializer_list<string> options){
     if(options.size == 2 && options[0] == 'x'){
         if(options[1] == 'l'){
@@ -100,6 +107,7 @@ bool DataBase<string, deque<string>>::set(const string& key, const string& value
     return false;
 }
 
+template<>
 int DataBase<string, deque<string>>::lpush(string key, string value){
     deque<string> d;
     if(m.count(key) == 1) {
@@ -110,6 +118,7 @@ int DataBase<string, deque<string>>::lpush(string key, string value){
     return static_cast<int>(d.size());
 }
 
+template<>
 int DataBase<string, deque<string>>::rpush(string key, string value){
     deque<string> d;
     if(m.count(key) == 1) {
@@ -120,6 +129,7 @@ int DataBase<string, deque<string>>::rpush(string key, string value){
     return static_cast<int>(d.size());
 }
 
+template<>
 int DataBase<string, deque<string>>::lpushx(string key, string value){
     if(m.count(key) == 1) {
         return lpush(key, value);
@@ -127,6 +137,7 @@ int DataBase<string, deque<string>>::lpushx(string key, string value){
     return 0;
 }
 
+template<>
 int DataBase<string, deque<string>>::rpushx(string key, string value){
     if(m.count(key) == 1) {
         return rpush(key, value);
@@ -134,7 +145,7 @@ int DataBase<string, deque<string>>::rpushx(string key, string value){
     return 0;
 }
 
-
+template<>
 int DataBase<string, deque<string>>::linsert(string key, string pivot, string value, bool before){
     if(m.count(key) == 0) {
         return -1;
@@ -152,6 +163,7 @@ int DataBase<string, deque<string>>::linsert(string key, string pivot, string va
     return static_cast<int>(d.size());
 }
 
+template<>
 vector<string> DataBase<string, deque<string>>::lrange(string key, int start, int end){
     vector<string> v;
     if(m.count(key) == 0) {
@@ -178,6 +190,7 @@ vector<string> DataBase<string, deque<string>>::lrange(string key, int start, in
     return v;
 }
 
+template<>
 bool DataBase<string, deque<string>>::lset(string key, int idx, string value){
     if(m.count(key) == 0) {
         //key does not exist so just return false
@@ -195,6 +208,7 @@ bool DataBase<string, deque<string>>::lset(string key, int idx, string value){
     return false;
 }
 
+template<>
 int DataBase<string, deque<string>>::lrem(string key, int count, string value){
     if(m.count(key) == 0) {
         //key does not exist so just return 0
@@ -229,6 +243,7 @@ int DataBase<string, deque<string>>::lrem(string key, int count, string value){
     return static_cast<int>(d.size());
 }
 
+template<>
 int DataBase<string, deque<string>>::ltrim(string key, int start, int end){
     if(m.count(key) == 0) {
         //key does not exist so just return 0
@@ -254,6 +269,7 @@ int DataBase<string, deque<string>>::ltrim(string key, int start, int end){
     return static_cast<int>(d.size());
 }
 
+template<>
 string DataBase<string, deque<string>>::rpoplpush(string source, string destination){
     if(m.count(source) == 0) {
         throw "rpoplpush: source key does not exist in the list.";
@@ -263,6 +279,7 @@ string DataBase<string, deque<string>>::rpoplpush(string source, string destinat
     return s;
 }
 
+template<>
 string DataBase<string, deque<string>>::lindex(string key, int idx) {
     if(m.count(key) == 0) {
         throw "lindex: key does not exist in the list.";
@@ -277,6 +294,7 @@ string DataBase<string, deque<string>>::lindex(string key, int idx) {
     return d[idx];
 }
 
+template<>
 int DataBase<string, deque<string>>::llen(string key){
     if(m.count(key) == 0) {
         return 0;
