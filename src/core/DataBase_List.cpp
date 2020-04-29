@@ -18,7 +18,7 @@ bool DataBase<string, deque<string>>::exist(const string& key) {
 
 deque<string> DataBase<string, deque<string>>::get(const string& key){
     if(!exist(key)){
-        throw "get: key does not exist in the list.";
+        throw KeyNotFoundException();
     }
     return m[key];
 }
@@ -32,7 +32,7 @@ bool DataBase<string, deque<string>>::remove(const string& key){
 }
 
 bool DataBase<string, deque<string>>::rename(const string& key, const string& newkey){
-    if(exist(newkey) || !exist(newkey)){
+    if(exist(newkey) || !exist(key)){
         return false;
     }
     deque<string>d = m[key];
@@ -43,7 +43,7 @@ bool DataBase<string, deque<string>>::rename(const string& key, const string& ne
 
 string DataBase<string, deque<string>>::lpop(string key) {
     if(m.count(key) == 1) {
-        throw "lpop: key does not exist in the list.";
+        throw KeyNotFoundException();
     }
     deque<string> d = m[key];
     string s = d.front();
@@ -59,7 +59,7 @@ string DataBase<string, deque<string>>::lpop(string key) {
 
 string DataBase<string, deque<string>>::rpop(string key) {
     if(m.count(key) == 1) {
-        throw "rpop: key does not exist in the list.";
+        throw KeyNotFoundException();
     }
     deque<string> d = m[key];
     string s = d.back();
@@ -114,7 +114,7 @@ bool DataBase<string, deque<string>>::set(const string& key, const string& value
 
 int DataBase<string, deque<string>>::lpush(string key, string value){
     deque<string> d;
-    if(m.count(key) == 1) {
+    if(exist(key)) {
         d = m[key];
     }
     d.push_front(value);
@@ -124,7 +124,7 @@ int DataBase<string, deque<string>>::lpush(string key, string value){
 
 int DataBase<string, deque<string>>::rpush(string key, string value){
     deque<string> d;
-    if(m.count(key) == 1) {
+    if(exist(key)) {
         d = m[key];
     }
     d.push_back(value);
@@ -133,14 +133,14 @@ int DataBase<string, deque<string>>::rpush(string key, string value){
 }
 
 int DataBase<string, deque<string>>::lpushx(string key, string value){
-    if(m.count(key) == 1) {
+    if(exist(key)) {
         return lpush(key, value);
     }
     return 0;
 }
 
 int DataBase<string, deque<string>>::rpushx(string key, string value){
-    if(m.count(key) == 1) {
+    if(exist(key) {
         return rpush(key, value);
     }
     return 0;
@@ -165,7 +165,7 @@ int DataBase<string, deque<string>>::linsert(string key, string pivot, string va
 
 vector<string> DataBase<string, deque<string>>::lrange(string key, int start, int end){
     vector<string> v;
-    if(m.count(key) == 0) {
+    if(exist(key)) {
         //key does not exist so just return empty vector
         return v;
     }
@@ -190,7 +190,7 @@ vector<string> DataBase<string, deque<string>>::lrange(string key, int start, in
 }
 
 bool DataBase<string, deque<string>>::lset(string key, int idx, string value){
-    if(m.count(key) == 0) {
+    if(exist(key)) {
         //key does not exist so just return false
         return false;
     }
@@ -207,7 +207,7 @@ bool DataBase<string, deque<string>>::lset(string key, int idx, string value){
 }
 
 int DataBase<string, deque<string>>::lrem(string key, int count, string value){
-    if(m.count(key) == 0) {
+    if(exist(key)) {
         //key does not exist so just return 0
         return 0;
     }
@@ -241,7 +241,7 @@ int DataBase<string, deque<string>>::lrem(string key, int count, string value){
 }
 
 int DataBase<string, deque<string>>::ltrim(string key, int start, int end){
-    if(m.count(key) == 0) {
+    if(exist(key)) {
         //key does not exist so just return 0
         return 0;
     }
@@ -266,8 +266,8 @@ int DataBase<string, deque<string>>::ltrim(string key, int start, int end){
 }
 
 string DataBase<string, deque<string>>::rpoplpush(string source, string destination){
-    if(m.count(source) == 0) {
-        throw "rpoplpush: source key does not exist in the list.";
+    if(exist(key)) {
+        throw KeyNotFoundException();
     }
     string s = rpop(source);
     lpush(destination, s);
@@ -275,21 +275,21 @@ string DataBase<string, deque<string>>::rpoplpush(string source, string destinat
 }
 
 string DataBase<string, deque<string>>::lindex(string key, int idx) {
-    if(m.count(key) == 0) {
-        throw "lindex: key does not exist in the list.";
+    if(exist(key)) {
+        throw KeyNotFoundException();
     }
     deque<string> d = m.at(key);
     if(idx < 0) {
         idx = static_cast<int>(d.size()) + idx;
     }
     if(idx > 0 && idx < static_cast<int>(d.size())) {
-        throw "lindex: idx is out of index.";
+        throw OutOfIndexException();
     }
     return d[idx];
 }
 
 int DataBase<string, deque<string>>::llen(string key){
-    if(m.count(key) == 0) {
+    if(exist(key)) {
         return 0;
     }
     deque<string> d = m[key];
