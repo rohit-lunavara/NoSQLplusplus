@@ -80,7 +80,8 @@ bool DataBase<std::string, std::string>::set(
 	for ( const auto& option : options ) {
 		// NX -> Set if it does not exist
 		// XX -> Set if it exists
-		if ( ( option == "NX" && k_str == r_strings_.end() ) || ( option == "XX" && k_str != r_strings_.end() ) ) {
+		if ( ( option == "NX" && k_str == r_strings_.end() ) ||
+                  ( option == "XX" && k_str != r_strings_.end() ) ) {
 			r_strings_[k] = v ;
 			return true ;
 		}

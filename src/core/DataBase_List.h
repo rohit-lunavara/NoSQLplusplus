@@ -13,7 +13,7 @@
 #include <initializer_list>
 
 //Base
-#include "DataBase.h"
+// #include "DataBase.h"
 
 template<>
 class DataBase<std::string, std::deque<std::string>>
@@ -106,3 +106,323 @@ private:
     //Returns the size of the list.
     int rpushx(std::string key, std::string value);
 };
+
+bool DataBase<std::string, std::deque<std::string>>::exist(const std::string& key) {
+    return m.count(key);
+}
+
+std::deque<std::string> DataBase<std::string, std::deque<std::string>>::get(
+        const std::string& key){
+    if(!exist(key)){
+        throw KeyNotFoundException();
+    }
+    return m[key];
+}
+
+bool DataBase<std::string, std::deque<std::string>>::remove(
+        const std::string& key){
+    if(!exist(key)){
+        return false;
+    }
+    m.erase(key);
+    return true;
+}
+
+bool DataBase<std::string, std::deque<std::string>>::rename(
+        const std::string& key, 
+        const std::string& newkey){
+    if(exist(newkey) || !exist(key)){
+        return false;
+    }
+    auto d = m[key];
+    m.erase(key);
+    m[newkey] = d;
+    return true;
+}
+
+std::string DataBase<std::string, std::deque<std::string>>::lpop(std::string key) {
+    if(!exist(key)) {
+        throw KeyNotFoundException();
+    }
+    std::deque<std::string> d = m[key];
+    std::string s = d.front();
+    d.pop_front();
+    if(d.empty()){
+        m.erase(key);
+    }
+    else {
+        m[key] = d;
+    }
+    return s;
+}
+
+std::string DataBase<std::string, std::deque<std::string>>::rpop(std::string key) {
+    if(!exist(key)) {
+        throw KeyNotFoundException();
+    }
+    std::deque<std::string> d = m[key];
+    std::string s = d.back();
+    d.pop_back();
+    if(d.empty()){
+        m.erase(key);
+    }
+    else {
+        m[key] = d;
+    }
+    return s;
+}
+
+bool DataBase<std::string, std::deque<std::string>>::set(
+        const std::string& key, 
+        const std::string& value, 
+        std::initializer_list<std::string> options){
+    for ( auto& option : options ) {
+        std::for_each(option.begin(), option.end(), ::toupper);
+    }
+    auto it=options.begin();
+    if(options.size() == 2){
+        if(*it == "X"){
+            it++;
+            if(*it == "R"){
+                return rpushx(key, value);
+            }
+            else if(*it == "L"){
+                return lpushx(key, value);
+            }
+        }
+        else if(*it == "R"){
+            it++;
+            if(*it == "X"){
+                return rpushx(key, value);
+            }
+        }
+        else if(*it == "L"){
+            it++;
+            if(*it == "X"){
+                return lpushx(key, value);
+            }
+        }
+    }
+    else if(options.size() == 1){
+        if(*it == "R"){
+            return rpush(key, value);
+        }
+        else if(*it == "L"){
+            return lpush(key, value);
+        }
+    }
+    return false;
+}
+
+int DataBase<std::string, std::deque<std::string>>::lpush(
+        std::string key, 
+        std::string value){
+    std::deque<std::string> d;
+    if(exist(key)) {
+        d = m[key];
+    }
+    d.push_front(value);
+    m[key] = d;
+    return static_cast<int>(d.size());
+}
+
+int DataBase<std::string, std::deque<std::string>>::rpush(
+        std::string key, std::string value){
+    std::deque<std::string> d;
+    if(exist(key)) {
+        d = m[key];
+    }
+    d.push_back(value);
+    m[key] = d;
+    return static_cast<int>(d.size());
+}
+
+int DataBase<std::string, std::deque<std::string>>::lpushx(
+        std::string key, 
+        std::string value){
+    if(exist(key)) {
+        return lpush(key, value);
+    }
+    return 0;
+}
+
+int DataBase<std::string, std::deque<std::string>>::rpushx(
+        std::string key, 
+        std::string value){
+    if(exist(key)) {
+        return rpush(key, value);
+    }
+    return 0;
+}
+
+int DataBase<std::string, std::deque<std::string>>::linsert(
+        std::string key, 
+        std::string pivot, 
+        std::string value, bool before){
+    if(m.count(key) == 0) {
+        return -1;
+    }
+    std::deque<std::string> d = m[key];
+    auto it = std::find(d.begin(),d.end(),pivot);
+    if(it == d.end()) {
+        return -1;
+    }
+    if(before){
+        if(it == d.begin()){
+            return lpush(key, value);
+        }
+        it--;
+    }
+    d.insert(it, value);
+    m[key] = d;
+    return static_cast<int>(d.size());
+}
+
+std::vector<std::string> DataBase<std::string, std::deque<std::string>>::lrange(
+        std::string key, int start, int end){
+
+    using std::min;
+    using std::max;
+    std::vector<std::string> v;
+    if(!exist(key)) {
+        //key does not exist so just return empty vector
+        return v;
+    }
+    std::deque<std::string> d = m[key];
+    if (start < 0) {
+        start = static_cast<int>(d.size()) + start;
+    }
+    start = max(0,start);
+    
+    if (end < 0) {
+        end = static_cast<int>(d.size()) + end;
+    }
+    end = min(end + 1, static_cast<int>(d.size()));
+    
+    if (start < end) {
+        v.reserve(end - start);
+        for(int i = start; i < end; i++){
+            v.push_back(d[i]);
+        }
+    }
+    return v;
+}
+
+bool DataBase<std::string, std::deque<std::string>>::lset(
+        std::string key, 
+        int idx, 
+        std::string value){
+    if(!exist(key)) {
+        //key does not exist so just return false
+        return false;
+    }
+    std::deque<std::string> d = m[key];
+    if(idx < 0) {
+        idx = static_cast<int>(d.size()) + idx;
+    }
+    if(idx >= 0 && idx < static_cast<int>(d.size())) {
+        d[idx] = value;
+        m[key] = d;
+        return true;
+    }
+    return false;
+}
+
+int DataBase<std::string, std::deque<std::string>>::lrem(
+        std::string key, int count, std::string value){
+    if(!exist(key)) {
+        //key does not exist so just return 0
+        return 0;
+    }
+    std::deque<std::string> d = m[key];
+    if(count > 0) {
+        auto it = std::find(d.begin(),d.end(),value);
+        while(it != d.end() && count > 0){
+            d.erase(it);
+            it = find(d.begin(),d.end(),value);
+            count --;
+        }
+    }
+    else if (count < 0){
+        auto it = find(d.end(),d.begin(),value);
+        while(it != d.begin() && count < 0){
+            d.erase(it);
+            it = find(d.end(),d.begin(),value);
+            count ++;
+        }
+    }
+    else {
+        //0 erase all
+        auto it = find(d.begin(),d.end(),value);
+        while(it != d.end()){
+            d.erase(it);
+            it = find(d.begin(),d.end(),value);
+        }
+    }
+    m[key] = d;
+    return static_cast<int>(d.size());
+}
+
+int DataBase<std::string, std::deque<std::string>>::ltrim(
+        std::string key, int start, int end){
+
+    using std::min;
+    using std::max;
+    if(!exist(key)) {
+        //key does not exist so just return 0
+        return 0;
+    }
+    std::deque<std::string> d = m[key];
+    if (start < 0) {
+        start = static_cast<int>(d.size()) + start;
+    }
+    start = max(0,start);
+    
+    if (end < 0) {
+        end = static_cast<int>(d.size()) + end;
+    }
+    end = min(end + 1, static_cast<int>(d.size()));
+    std::deque<std::string> new_d;
+    if (start < end) {
+        for(int i = start; i < end; i++) {
+            new_d.push_back(d[i]);
+        }
+        m[key] = new_d;
+        return static_cast<int>(new_d.size());
+    }
+    return static_cast<int>(d.size());
+}
+
+std::string DataBase<std::string, std::deque<std::string>>::rpoplpush(
+        std::string source, 
+        std::string destination){
+    if(!exist(source)) {
+        throw KeyNotFoundException();
+    }
+    auto s = rpop(source);
+    lpush(destination, s);
+    return s;
+}
+
+std::string DataBase<std::string, std::deque<std::string>>::lindex(
+        std::string key, int idx) {
+    if(!exist(key)) {
+        throw KeyNotFoundException();
+    }
+    std::deque<std::string> d = m.at(key);
+    if(idx < 0) {
+        idx = static_cast<int>(d.size()) + idx;
+    }
+    if(idx < 0 || idx > static_cast<int>(d.size())) {
+        throw OutOfIndexException();
+    }
+    return d[idx];
+}
+
+int DataBase<std::string, std::deque<std::string>>::llen(std::string key){
+    if(!exist(key)) {
+        return 0;
+    }
+    std::deque<std::string> d = m[key];
+    return static_cast<int>(d.size());
+}

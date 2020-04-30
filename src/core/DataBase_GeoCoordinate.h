@@ -4,6 +4,7 @@
 #include "DataBase_Errors.h"
 
 #include <set>
+#include <locale>
 
 template <>
 class DataBase<std::string, Geography::GeoCoordinate>
@@ -15,7 +16,7 @@ public:
         Geography::GeoCoordinate get(const std::string& key);
 
         bool set(const std::string& key, const Geography::GeoCoordinate& value,
-                std::initializer_list<std::string> options);
+                std::initializer_list<std::string> options = {});
         
         bool exist(const std::string& key);
         bool remove(const std::string& key);
@@ -36,10 +37,29 @@ bool DataBase<std::string, Geography::GeoCoordinate>::set(
         const Geography::GeoCoordinate& value, 
         std::initializer_list<std::string> options)
 {
-        // TODO options
-        rtree_.insert(key, value, 0.);
-        table_[key] = value;
-        return true;
+        for (auto& option : options) {
+		std::for_each(option.begin(), option.end(), ::toupper);
+	}
+
+	for (const auto& option : options) {
+		// NX -> Set if it does not exist
+		// XX -> Set if it exists
+		if ((option == "NX" && !exist(key)) ||
+                        (option == "XX" && exist(key)) ) {
+                        rtree_.insert(key, value, 0.);
+                        table_[key] = value;			
+			return true;
+		}
+	}
+
+	if ( options.size() == 0 ) {
+                rtree_.insert(key, value, 0.);
+                table_[key] = value;
+		return true ;
+	}
+	else {
+		return false ;
+	}
 }
 
 // O (1)
@@ -48,7 +68,7 @@ DataBase<std::string, Geography::GeoCoordinate>::get(const std::string& key)
 {
 	if (!exist(key))
         {
-		throw ValueNotFoundException();
+		throw KeyNotFoundException();
 	}
         return table_[key];
 }
@@ -80,7 +100,7 @@ Geography::GeoCoordinate DataBase<std::string, Geography::GeoCoordinate>::getset
 {
         if (!exist(key))
         {
-                throw ValueNotFoundException();
+                throw KeyNotFoundException();
         }
 
         auto oldvalue = get(key);
