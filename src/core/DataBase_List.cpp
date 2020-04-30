@@ -29,6 +29,7 @@ bool DataBase<string, deque<string>>::remove(const string& key){
         return false;
     }
     m.erase(key);
+    keys.erase(key);
     return true;
 }
 
@@ -38,8 +39,14 @@ bool DataBase<string, deque<string>>::rename(const string& key, const string& ne
     }
     deque<string>d = m[key];
     m.erase(key);
+    keys.erase(key);
     m[newkey] = d;
+    keys.insert(newkey);
     return true;
+}
+
+unordered_set<string> DataBase<string, deque<string>>::getKeys(){
+    return keys;
 }
 
 string DataBase<string, deque<string>>::lpop(string key) {
@@ -51,6 +58,7 @@ string DataBase<string, deque<string>>::lpop(string key) {
     d.pop_front();
     if(d.empty()){
         m.erase(key);
+        keys.erase(key);
     }
     else {
         m[key] = d;
@@ -67,6 +75,7 @@ string DataBase<string, deque<string>>::rpop(string key) {
     d.pop_back();
     if(d.empty()){
         m.erase(key);
+        keys.erase(key);
     }
     else {
         m[key] = d;
@@ -120,6 +129,7 @@ int DataBase<string, deque<string>>::lpush(string key, string value){
     }
     d.push_front(value);
     m[key] = d;
+    keys.insert(key);
     return static_cast<int>(d.size());
 }
 
@@ -130,6 +140,7 @@ int DataBase<string, deque<string>>::rpush(string key, string value){
     }
     d.push_back(value);
     m[key] = d;
+    keys.insert(key);
     return static_cast<int>(d.size());
 }
 

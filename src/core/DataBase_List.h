@@ -8,6 +8,7 @@
 #include <deque>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 // OPTIONS
 #include <initializer_list>
@@ -34,6 +35,9 @@ public :
     // Returns false if the key does not exist or the newkey already exists.
     // Returns true for a successful rename.
     bool rename(const std::string& key, const std::string& newkey);
+    
+    //Returns an unordered_set of key names.
+    std::unordered_set<std::string> getKeys();
     
     //Removes and returns the first element of the list stored at key.
     std::string lpop(std::string key);
@@ -89,6 +93,7 @@ public :
     
 private:
     std::unordered_map<std::string, std::deque<std::string>> m;
+    std::unordered_set<std::string>keys;
     
     //Inserts the value at the head of the list. If a list does not exist for a key then the list is created.
     //Returns the size of the list.
