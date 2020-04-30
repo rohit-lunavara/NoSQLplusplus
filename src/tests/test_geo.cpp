@@ -6,6 +6,22 @@
 
 using namespace std;
 
+void test1()
+{
+	using namespace Geography;
+	DataBase<string, GeoCoordinate> db;
+        cout << db.set("New York", {30.7128_N, 24.0060_E}, {"XX"}) << '\n';
+	cout << db.set("New York", {50.7128_N, 74.0060_E}) << '\n';
+        cout << db.set("New York", {40.7128_N, 74.0060_E}, {"XX"}) << '\n';
+        cout << db.set("New York", {10.7128_N, 24.0060_E}, {"NX"}) << '\n';
+	cout << db.set("London", {51.5074_N, 0.1278_W}) << '\n';
+
+	cout << db.get("New York") << '\n';
+	cout << db.get("London") << '\n';
+	
+	cout << "distance: " << db.distance("New York", "London") << "km\n";
+}
+
 void test2()
 {
 	using namespace Geography;
@@ -96,9 +112,10 @@ void test3()
 
 int main()
 {
-	// test1();
+	test1();
 	// test2();
-        test3();
+        // test3();
+
 	// this does not compile
 	// DataBase<int, int> db;
 	// cout << db.set(1, 2) << '\n';

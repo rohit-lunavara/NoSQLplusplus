@@ -9,7 +9,7 @@ set_target_properties(test1 PROPERTIES LINKER_LANGUAGE CXX)
 
 add_executable(
     test2
-    test2.cpp
+    test_geo.cpp
 )
 
 target_link_libraries (test2 nosql++)
@@ -39,3 +39,19 @@ add_executable(
 
 target_link_libraries (test5 nosql++)
 set_target_properties(test5 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(
+    test6
+    ListTests.cpp
+)
+
+target_link_libraries (test6 nosql++)
+set_target_properties(test6 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(
+    test7
+    ListTest2.cpp
+)
+
+target_link_libraries (test7 nosql++)
+set_target_properties(test7 PROPERTIES LINKER_LANGUAGE CXX)
