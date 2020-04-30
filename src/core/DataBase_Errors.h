@@ -8,6 +8,10 @@ public :
 	virtual const char* what() const noexcept {
 		return "ERROR : Expected to find a key." ;
 	}
+} ;
+
+class OutOfIndexException : public std::exception {
+public :
     OutOfIndexException() = default ;
     ~OutOfIndexException() = default ;
     virtual const char* what() const noexcept {
