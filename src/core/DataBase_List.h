@@ -58,11 +58,11 @@ public :
     int linsert(std::string key, std::string pivot, std::string value, bool before);
     
     //Returns a vector of all string values in the given range.
-    //Negative values will be count from the tail.
+    //Negative values will be counted from the tail.
     std::vector<std::string> lrange(std::string key, int start, int end);
     
     //Sets a value for the given index idx.
-    //Negative values will be count from the tail.
+    //Negative values will be counted from the tail.
     //Returns true if the index is exists and false if it does not.
     bool lset(std::string key, int idx, std::string value);
     

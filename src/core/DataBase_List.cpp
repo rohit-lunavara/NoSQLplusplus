@@ -9,11 +9,12 @@
 //
 
 #include "DataBase_List.h"
+#include "DataBase_Errors.h"
 
 using namespace std;
 
 bool DataBase<string, deque<string>>::exist(const string& key) {
-    return (m.count(key) == 1);
+    return m.count(key);
 }
 
 deque<string> DataBase<string, deque<string>>::get(const string& key){
@@ -42,7 +43,7 @@ bool DataBase<string, deque<string>>::rename(const string& key, const string& ne
 }
 
 string DataBase<string, deque<string>>::lpop(string key) {
-    if(m.count(key) == 1) {
+    if(!exist(key)) {
         throw KeyNotFoundException();
     }
     deque<string> d = m[key];
@@ -58,7 +59,7 @@ string DataBase<string, deque<string>>::lpop(string key) {
 }
 
 string DataBase<string, deque<string>>::rpop(string key) {
-    if(m.count(key) == 1) {
+    if(!exist(key)) {
         throw KeyNotFoundException();
     }
     deque<string> d = m[key];
@@ -140,7 +141,7 @@ int DataBase<string, deque<string>>::lpushx(string key, string value){
 }
 
 int DataBase<string, deque<string>>::rpushx(string key, string value){
-    if(exist(key) {
+    if(exist(key)) {
         return rpush(key, value);
     }
     return 0;
@@ -156,6 +157,9 @@ int DataBase<string, deque<string>>::linsert(string key, string pivot, string va
         return -1;
     }
     if(before){
+        if(it == d.begin()){
+            return lpush(key, value);
+        }
         it--;
     }
     d.insert(it, value);
@@ -165,7 +169,7 @@ int DataBase<string, deque<string>>::linsert(string key, string pivot, string va
 
 vector<string> DataBase<string, deque<string>>::lrange(string key, int start, int end){
     vector<string> v;
-    if(exist(key)) {
+    if(!exist(key)) {
         //key does not exist so just return empty vector
         return v;
     }
@@ -190,7 +194,7 @@ vector<string> DataBase<string, deque<string>>::lrange(string key, int start, in
 }
 
 bool DataBase<string, deque<string>>::lset(string key, int idx, string value){
-    if(exist(key)) {
+    if(!exist(key)) {
         //key does not exist so just return false
         return false;
     }
@@ -207,7 +211,7 @@ bool DataBase<string, deque<string>>::lset(string key, int idx, string value){
 }
 
 int DataBase<string, deque<string>>::lrem(string key, int count, string value){
-    if(exist(key)) {
+    if(!exist(key)) {
         //key does not exist so just return 0
         return 0;
     }
@@ -241,7 +245,7 @@ int DataBase<string, deque<string>>::lrem(string key, int count, string value){
 }
 
 int DataBase<string, deque<string>>::ltrim(string key, int start, int end){
-    if(exist(key)) {
+    if(!exist(key)) {
         //key does not exist so just return 0
         return 0;
     }
@@ -260,13 +264,14 @@ int DataBase<string, deque<string>>::ltrim(string key, int start, int end){
         for(int i = start; i < end; i++) {
             new_d.push_back(d[i]);
         }
+        m[key] = new_d;
         return static_cast<int>(new_d.size());
     }
     return static_cast<int>(d.size());
 }
 
 string DataBase<string, deque<string>>::rpoplpush(string source, string destination){
-    if(exist(key)) {
+    if(!exist(source)) {
         throw KeyNotFoundException();
     }
     string s = rpop(source);
@@ -275,21 +280,21 @@ string DataBase<string, deque<string>>::rpoplpush(string source, string destinat
 }
 
 string DataBase<string, deque<string>>::lindex(string key, int idx) {
-    if(exist(key)) {
+    if(!exist(key)) {
         throw KeyNotFoundException();
     }
     deque<string> d = m.at(key);
     if(idx < 0) {
         idx = static_cast<int>(d.size()) + idx;
     }
-    if(idx > 0 && idx < static_cast<int>(d.size())) {
+    if(idx < 0 || idx > static_cast<int>(d.size())) {
         throw OutOfIndexException();
     }
     return d[idx];
 }
 
 int DataBase<string, deque<string>>::llen(string key){
-    if(exist(key)) {
+    if(!exist(key)) {
         return 0;
     }
     deque<string> d = m[key];
