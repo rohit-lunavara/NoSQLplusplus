@@ -8,6 +8,7 @@
 #include <deque>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 // OPTIONS
 #include <initializer_list>
@@ -34,6 +35,9 @@ public :
     // Returns false if the key does not exist or the newkey already exists.
     // Returns true for a successful rename.
     bool rename(const std::string& key, const std::string& newkey);
+    
+    //Returns an unordered_set of key names.
+    std::unordered_set<std::string> getKeys();
     
     //Removes and returns the first element of the list stored at key.
     std::string lpop(std::string key);
@@ -89,6 +93,7 @@ public :
     
 private:
     std::unordered_map<std::string, std::deque<std::string>> m;
+    std::unordered_set<std::string> keys;
     
     //Inserts the value at the head of the list. If a list does not exist for a key then the list is created.
     //Returns the size of the list.
@@ -125,7 +130,13 @@ bool DataBase<std::string, std::deque<std::string>>::remove(
         return false;
     }
     m.erase(key);
+    keys.erase(key);
     return true;
+}
+
+std::unordered_set<std::string> DataBase<std::string, std::deque<std::string>>::getKeys()
+{
+    return keys;
 }
 
 bool DataBase<std::string, std::deque<std::string>>::rename(
@@ -136,7 +147,9 @@ bool DataBase<std::string, std::deque<std::string>>::rename(
     }
     auto d = m[key];
     m.erase(key);
+    keys.erase(key);
     m[newkey] = d;
+    keys.insert(newkey);
     return true;
 }
 
@@ -149,6 +162,7 @@ std::string DataBase<std::string, std::deque<std::string>>::lpop(std::string key
     d.pop_front();
     if(d.empty()){
         m.erase(key);
+        keys.erase(key);
     }
     else {
         m[key] = d;
@@ -165,6 +179,7 @@ std::string DataBase<std::string, std::deque<std::string>>::rpop(std::string key
     d.pop_back();
     if(d.empty()){
         m.erase(key);
+        keys.erase(key);
     }
     else {
         m[key] = d;
@@ -220,6 +235,7 @@ int DataBase<std::string, std::deque<std::string>>::lpush(
     std::deque<std::string> d;
     if(exist(key)) {
         d = m[key];
+        keys.insert(key);
     }
     d.push_front(value);
     m[key] = d;
@@ -234,6 +250,7 @@ int DataBase<std::string, std::deque<std::string>>::rpush(
     }
     d.push_back(value);
     m[key] = d;
+    keys.insert(key);
     return static_cast<int>(d.size());
 }
 

@@ -47,3 +47,11 @@ add_executable(
 
 target_link_libraries (test6 nosql++)
 set_target_properties(test6 PROPERTIES LINKER_LANGUAGE CXX)
+
+add_executable(
+    test7
+    ListTest2.cpp
+)
+
+target_link_libraries (test7 nosql++)
+set_target_properties(test7 PROPERTIES LINKER_LANGUAGE CXX)
