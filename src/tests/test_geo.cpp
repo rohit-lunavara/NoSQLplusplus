@@ -161,7 +161,75 @@ void test_interactive()
         }
 
         cout << "set all cities successfully!\n";
+        while(true)
+        {
+                string linecommand;
+                getline(cin, linecommand);
+                istringstream ss(linecommand);
         
+                string opt;
+                getline(ss, opt, ' ');
+                if (opt == "radius")
+                {
+                        string cityname, state;
+                        getline(ss, cityname, ',');
+                        getline(ss, state, ' ');
+                        getline(ss, state, ' ');
+                       
+
+                        string radius;
+                        getline(ss, radius, '\n');
+                        double rad = stof(radius);
+
+                        cout << "[query]" << "cityname: " << cityname
+                                << ", state: " << state
+                                << ", radius: " << rad << "\n";
+                        set<string> results = db.radius(cityname + ", " + state, rad);
+                        cout << "[results]\n";
+                        for (const auto& r : results)
+                        {
+                                cout << r << ", distance: "
+                                        << db.distance(r, cityname + ", " + state) 
+                                        << "\n";
+                        }    
+                }
+                else if (opt == "rename")
+                {
+                        string cityname1, state1;
+                        getline(ss, cityname1, ',');
+                        getline(ss, state1, ' ');
+                        getline(ss, state1, ' ');
+
+                        string cityname2, state2;
+                        getline(ss, cityname2, ',');
+                        getline(ss, state2, ' ');
+                        getline(ss, state2, ' ');    
+
+                        string city1 = cityname1 + ", " + state1;
+                        string city2 = cityname2 + ", " + state2;
+
+                        cout << "[command] rename " << city1 << " as "
+                                << city2 << "\n";
+
+                        if (db.rename(city1, city2))
+                        {
+                                cout << "successful\n";
+                        }
+                        else
+                        {
+                                cout << "failed\n";
+                        }
+                }
+                else if (opt == "exit")
+                {
+                        break;
+                }
+                else
+                {
+                        cout << "[command] not supported\n";
+                }
+
+        }
 }
 
 // 1. write down why using data type
