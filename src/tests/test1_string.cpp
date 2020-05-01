@@ -84,11 +84,11 @@ int main () {
 	cout << db.setrange("new", 5, "+world") << "\n" ;
 	cout << db.get("new") << "\n" ;
 
-	// Strlen
+	// Size
 	cout << "------------------------------\n" ;
-	cout << db.strlen("new") << " " << db.get("new") << "\n" ;
-	cout << db.strlen("new_test") << " " << db.get("new_test") << "\n" ;
-	cout << db.strlen("better_test") << " " << db.get("better_test") << "\n" ;
+	cout << db.size("new") << " " << db.get("new") << "\n" ;
+	cout << db.size("new_test") << " " << db.get("new_test") << "\n" ;
+	cout << db.size("better_test") << " " << db.get("better_test") << "\n" ;
 
 	// Mset
 	// cout << "------------------------------\n" ;

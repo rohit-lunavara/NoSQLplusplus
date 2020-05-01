@@ -103,7 +103,7 @@ int main () {
 	std::cout << "---------------------------------------------------------------------------\n" ;
 	std::cout << "Number of characters in each line for unique words in the text :\n" ;
 	for ( const auto& k : ks ) {
-		auto v_len = str_db.strlen(k) ;
+		auto v_len = str_db.size(k) ;
 		std::cout << k << " : " << v_len << "\n" ;
 	}
 	std::cout << "---------------------------------------------------------------------------\n" ;

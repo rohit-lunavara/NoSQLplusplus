@@ -129,17 +129,6 @@ private :
 	std::unordered_map<std::string, std::string> r_strings_ ;
 } ;
 
-// Find a better option compared to exceptions for missing values
-class NonStringValueException : public std::exception {
-public :
-	NonStringValueException() = default;
-	~NonStringValueException() = default;
-	virtual const char* what() const noexcept {
-		return "ERROR : Expected string value." ;
-	}
-} ;
-
-
 /**
 @brief
 Sets a string key to a string value in the database.
@@ -240,14 +229,15 @@ where, n -> Number of key-value pairs in the database.
 Throws KeyNotFoundException if any get fails.
 
 @param[in]
-
-@param[out]
-
-@param[in/out]
+std::vector<std::string> keys
 
 @class
+DataBase<std::string, std::string>
 
 @example
+str_db.set("great", "amazing") ;
+str_db.set("fantastic", "awesome") ;
+str_db.get({"great", "fantastic"}) ; // Returns { "amazing", "awesome" }
 
 @return
 std::vector<std::string>
