@@ -1,7 +1,14 @@
+/*
+Author : Rohit Lalit Lunavara
+UNI : rll2181
+
+String module for the database.
+*/
+
 #pragma once
 
 // DEBUG
-#include <iostream>
+// #include <iostream>
 
 // TYPE INFORMATION
 #include <cstdint>
@@ -34,7 +41,8 @@ class DataBase<std::string, std::string>
 public :
 	bool set(const std::string& k, const std::string& v, std::initializer_list<std::string> options = {}) ;
 	std::string get(const std::string& k) ;
-	std::string getset(const std::string& k, const std::string& v, std::initializer_list<std::string> options = {}) ;
+	std::vector<std::string> get(const std::vector<std::string>& ks) ;
+	std::string getset(const std::string& k, const std::string& v) ;
 	bool remove(const std::string& k) ;
 	bool rename(const std::string& old_k, const std::string& new_k) ;
 	bool exist(const std::string& k) ;
@@ -42,16 +50,15 @@ public :
 	// mset
 	// std::vector<bool> set(const key_value_container<std::string, std::string> k_v) ;
 	// mget
-	std::vector<std::string> get(const std::vector<std::string>& ks) ;
 	// mgetset
 	// std::vector<std::string> getset(const key_value_container<std::string, std::string> k_v) ;
 	std::vector<std::string> get_keys() ;
 
 	// String specific methods
-	int64_t append(const std::string& k, const std::string& v) ;
+	uint64_t append(const std::string& k, const std::string& v) ;
 	std::string getrange(const std::string& k, int64_t str_start, int64_t str_end) ;
-	int64_t setrange(const std::string& k, uint64_t offset, const std::string& v) ;
-	int64_t strlen(const std::string& k) ;
+	uint64_t setrange(const std::string& k, uint64_t offset, const std::string& v) ;
+	uint64_t size(const std::string& k) ;
 private :
 	std::unordered_map<std::string, std::string> r_strings_ ;
 } ;
@@ -66,6 +73,36 @@ public :
 	}
 } ;
 
+
+/*!
+@brief
+Sets a string key to a string value in the database.
+
+@details
+Time Complexity -> O(1)
+Options include "NX" and "XX".
+"NX" -> Set if it does not exist
+"XX" -> Set if it exists
+
+@param[in]
+std::string key
+
+@param[in]
+std::string value
+
+@param[in]
+std::initializer_list<std::string> options
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "amazing") ;
+
+@return
+bool 
+true -> If set successfully, false otherwise.
+*/
 bool DataBase<std::string, std::string>::set(
         const std::string& k, 
         const std::string& v, 
@@ -80,8 +117,7 @@ bool DataBase<std::string, std::string>::set(
 	for ( const auto& option : options ) {
 		// NX -> Set if it does not exist
 		// XX -> Set if it exists
-		if ( ( option == "NX" && k_str == r_strings_.end() ) ||
-                  ( option == "XX" && k_str != r_strings_.end() ) ) {
+		if ( ( option == "NX" && k_str == r_strings_.end() ) || ( option == "XX" && k_str != r_strings_.end() ) ) {
 			r_strings_[k] = v ;
 			return true ;
 		}
@@ -96,7 +132,30 @@ bool DataBase<std::string, std::string>::set(
 	}
 }
 
-std::string DataBase<std::string, std::string>::get(const std::string& k) {
+/*!
+
+@brief
+Get a string key from the database.
+
+@details
+Time Complexity -> O(1)
+Throws KeyNotFoundException if key is not found.
+
+@param[in]
+std::string key
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.get("great") ;
+
+@return
+std::string
+Value which exists for the key.
+*/
+std::string DataBase<std::string, std::string>::get(
+	const std::string& k) {
 	auto k_str = r_strings_.find(k) ;
 	if ( k_str == r_strings_.end() ) {
 		throw KeyNotFoundException();
@@ -104,16 +163,99 @@ std::string DataBase<std::string, std::string>::get(const std::string& k) {
 	return k_str->second ;
 }
 
+/*!
+
+@brief
+Get multiple strings from the database.
+
+@details
+Time Complexity -> O(n)
+where, n -> Number of key-value pairs in the database.
+Throws KeyNotFoundException if any get fails.
+
+@param[in]
+
+@param[out]
+
+@param[in/out]
+
+@class
+
+@example
+
+@return
+std::vector<std::string>
+
+*/
+std::vector<std::string> DataBase<std::string, std::string>::get(
+	const std::vector<std::string>& ks) {
+	std::vector<std::string> vs ;
+	vs.reserve(ks.size()) ;
+	for ( const auto& k : ks ) {
+		vs.push_back(DataBase<std::string, std::string>::get(k)) ;
+	}
+	return vs ;
+}
+
+/*!
+
+@brief
+Combines the get and set methods (without options).
+
+@details
+Time Complexity -> O(1)
+Does not allow set with options.
+Throws KeyNotFoundException if get fails.
+
+@param[in]
+std::string key
+
+@param[in]
+std::string value
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "awesome") ;
+str_db.getset("great", "fantastic") ; // Returns "awesome"
+
+@return
+std::string
+Old value for the given key.
+*/
 std::string DataBase<std::string, std::string>::getset(
 	const std::string& k, 
-	const std::string& v,
-	std::initializer_list<std::string> options) {
+	const std::string& v) {
 	std::string old_v { DataBase<std::string, std::string>::get(k) } ;
-	DataBase<std::string, std::string>::set(k, v, options) ;
+	DataBase<std::string, std::string>::set(k, v) ;
 	return old_v ;
 }
 
-bool DataBase<std::string, std::string>::remove(const std::string& k) {
+/*!
+
+@brief
+Removes key if it exists in the database.
+
+@details
+Time Complexity -> O(1)
+
+@param[in]
+std::string key
+
+@class
+DataBase<std::string, std::string>
+
+@example
+db.set("great", "amazing") ;
+db.remove("great") ;
+
+@return
+bool
+true -> If key removed successfully, false otherwise.
+*/
+bool DataBase<std::string, std::string>::remove(
+	const std::string& k) {
 	auto k_str = r_strings_.find(k) ;
 	if ( k_str == r_strings_.end() ) {
 		return false ;
@@ -124,7 +266,35 @@ bool DataBase<std::string, std::string>::remove(const std::string& k) {
 	}
 }
 
-bool DataBase<std::string, std::string>::rename(const std::string& old_k, const std::string& new_k) {
+/*!
+
+@brief
+Renames old key name to new key name if it exists in the database.
+
+@details
+Time Complexity -> O(1)
+
+@param[in]
+std::string old_key_name
+
+@param[in]
+std::string new_key_name
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "amazing") ;
+str_db.rename("great", "fantastic") ;
+str_db.get("fantastic") ; // Returns "amazing"
+
+@return
+bool
+true -> If it exists and is renamed, false otherwise.
+*/
+bool DataBase<std::string, std::string>::rename(
+	const std::string& old_k, 
+	const std::string& new_k) {
 	auto k_handle = r_strings_.extract(old_k) ;
 	if ( k_handle.empty() ) {
 		return false ;
@@ -136,7 +306,27 @@ bool DataBase<std::string, std::string>::rename(const std::string& old_k, const 
 	}
 }
 
-bool DataBase<std::string, std::string>::exist(const std::string& k) {
+/*!
+
+@brief
+Checks if a key exists in the database.
+
+@details
+Time Complexity -> O(1)
+
+@param[in]
+std::string key
+
+@class
+
+@example
+
+@return
+bool
+true -> If it exists, false otherwise.
+*/
+bool DataBase<std::string, std::string>::exist(
+	const std::string& k) {
 	return ( r_strings_.find(k) != r_strings_.end() ) ;
 }
 
@@ -149,16 +339,6 @@ bool DataBase<std::string, std::string>::exist(const std::string& k) {
 // 	}
 // 	return res ;
 // }
-
-std::vector<std::string> DataBase<std::string, std::string>::get(
-	const std::vector<std::string>& ks) {
-	std::vector<std::string> vs ;
-	vs.reserve(ks.size()) ;
-	for ( const auto& k : ks ) {
-		vs.push_back(DataBase<std::string, std::string>::get(k)) ;
-	}
-	return vs ;
-}
 
 // std::vector<std::string> getset(
 // 	const key_value_container<std::string, std::string> ks_vs) {
@@ -175,6 +355,27 @@ std::vector<std::string> DataBase<std::string, std::string>::get(
 // 	return res ;
 // }
 
+/*!
+
+@brief
+Get all the keys in the database.
+
+@details
+Time Complexity -> O(n)
+where, n -> Number of key-value pairs in the database.
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "amazing") ;
+str_db.set("fantastic", "awesome") ;
+str_db.get_keys() ; // Returns { "great", "fantastic" }
+
+@return
+std::vector<std::string>
+All keys present in the database.
+*/
 std::vector<std::string> DataBase<std::string, std::string>::get_keys() {
 	std::vector<std::string> res ;
 	res.reserve(r_strings_.size()) ;
@@ -184,9 +385,42 @@ std::vector<std::string> DataBase<std::string, std::string>::get_keys() {
 	return res ;
 }
 
-// String specific methods
+/********************************
+*
+* String specific methods
+*
+*********************************/
 
-int64_t DataBase<std::string, std::string>::append(
+
+/*!
+
+@brief
+Appends a value to a key.
+
+@details
+Time Complexity -> O(n + m)
+where, n -> Size of original string value.
+m -> Size of string value to be appended.
+Behaves like set if key does not exist.
+
+@param[in]
+std::string key
+
+@param[in]
+std::string append_value
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "amazing") ;
+str_db.append("great", " fantastic") ; // Returns 17
+
+@return
+int64_t
+Size of the value after the append operation.
+*/
+uint64_t DataBase<std::string, std::string>::append(
 	const std::string& k, 
 	const std::string& v) {
 	auto k_str = r_strings_.find(k) ;
@@ -201,6 +435,38 @@ int64_t DataBase<std::string, std::string>::append(
 	return ( v.size() ) ;
 }
 
+/*!
+
+@brief
+Get the substring of the value stored at key.
+
+@details
+Time Complexity -> O(n)
+where, n -> Size of the returned substring.
+Can specify negative start and end indices as well.
+
+@param[in]
+std::string key
+
+@param[in]
+int64_t string_start
+
+@param[in]
+int64_t string_end
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "amazing") ;
+str_db.getrange("great", 3, 7) ; // Returns "zing"
+str_db.getrange("great", 0, -1) ; // Returns "amazin"
+
+@return
+std::string
+If start < end, returns substring specified by the indices.
+If start >= end, returns an empty substring.
+*/
 std::string DataBase<std::string, std::string>::getrange(
 	const std::string& k, 
 	int64_t str_start, 
@@ -216,7 +482,7 @@ std::string DataBase<std::string, std::string>::getrange(
 	if ( str_end < 0 ) {
 		str_end = v_str_size + str_end ;
 	}
-	str_end = str_end > ( v_str_size - 1 ) ? v_str_size - 1 : str_end ;
+	str_end = str_end > ( v_str_size - 1 ) ? ( v_str_size - 1 ) : str_end ;
 
 	if ( str_start < str_end ) {
 		return v_str.substr(str_start, str_end - str_start) ;
@@ -224,7 +490,36 @@ std::string DataBase<std::string, std::string>::getrange(
 	return {} ;
 }
 
-int64_t DataBase<std::string, std::string>::setrange(
+/*!
+
+@brief
+Sets a value for the key starting at specified offset.
+
+@details
+Time Complexity -> O(*)
+?? UNKNOWN
+If the offset is out of the key's range, then it is padded with whitespaces.
+
+@param[in]
+std::string key
+
+@param[in]
+uint64_t offset
+
+@param[in]
+std::string value
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.setrange("great", 4, "amazing") ; // Returns "    amazing"
+
+@return
+uint64_t
+Size of the value after the setrange operation
+*/
+uint64_t DataBase<std::string, std::string>::setrange(
 	const std::string& k, 
 	uint64_t offset, 
 	const std::string& v) {
@@ -235,7 +530,7 @@ int64_t DataBase<std::string, std::string>::setrange(
 	if ( k_str == r_strings_.end() ) {
 		std::string padding (offset, ' ') ;
 		r_strings_[k] = padding + v ;
-		return r_strings_[k].size() ;
+		return ( r_strings_[k].size() ) ;
 	}
 	// Key exists
 	else {
@@ -245,11 +540,34 @@ int64_t DataBase<std::string, std::string>::setrange(
 			k_str->second += padding ;
 		}
 		k_str->second.replace(offset, v.size(), v) ;
-		return k_str->second.size() ;
+		return ( k_str->second.size() ) ;
 	}
 }
 
-int64_t DataBase<std::string, std::string>::strlen(
+/*!
+
+@brief
+Get the size of the value at the key.
+
+@details
+Time Complexity -> O(1)
+Throws KeyNotFoundException if key is not found.
+
+@param[in]
+std::string key
+
+@class
+DataBase<std::string, std::string>
+
+@example
+str_db.set("great", "amazing") ;
+str_db.size("great") ; // Returns 7
+
+@return
+uint64_t
+Size of the value at key.
+*/
+uint64_t DataBase<std::string, std::string>::size(
 	const std::string& k) {
 	return DataBase<std::string, std::string>::get(k).size() ;
 }
