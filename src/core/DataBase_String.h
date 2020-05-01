@@ -39,26 +39,92 @@ template<>
 class DataBase<std::string, std::string>
 {
 public :
+	/**
+		Sets a string key to a string value in the database.
+		Returns true -> If set successfully, false otherwise.
+	*/
 	bool set(const std::string& k, const std::string& v, std::initializer_list<std::string> options = {}) ;
+
+	/**
+		Get a value for the key from the database.
+		Throws KeyNotFoundException if key is not found.
+		Returns value which exists for the key.
+	*/
 	std::string get(const std::string& k) ;
+
+	/**
+		Get multiple values for the keys from the database.
+		Throws KeyNotFoundException if any key is not found.
+		Returns values which exist for the keys.
+	*/
 	std::vector<std::string> get(const std::vector<std::string>& ks) ;
+
+	/**
+		Combines the get and set methods (without options).
+		Throws KeyNotFoundException if key is not found.
+		Returns old value which existed for the key.
+	*/
 	std::string getset(const std::string& k, const std::string& v) ;
+
+	/**
+		Removes key if it exists in the database.
+		Returns true -> If key removed successfully, false otherwise.
+	*/
 	bool remove(const std::string& k) ;
+
+	/**
+		Renames old key name to new key name if it exists in the database.
+		Returns true -> If it exists and is renamed, false otherwise.
+	*/
 	bool rename(const std::string& old_k, const std::string& new_k) ;
+
+	/**
+		Checks if a key exists in the database.
+		Returns true -> If it exists, false otherwise.
+	*/
 	bool exist(const std::string& k) ;
-	// Overloads for set, get, getset
-	// mset
-	// std::vector<bool> set(const key_value_container<std::string, std::string> k_v) ;
-	// mget
-	// mgetset
-	// std::vector<std::string> getset(const key_value_container<std::string, std::string> k_v) ;
+
+	/**
+		Get all the keys in the database.
+		Returns all keys present in the database.
+	*/
 	std::vector<std::string> get_keys() ;
 
 	// String specific methods
+
+	/**
+		Appends a value to an existing key or sets a value if key does not exist.
+		Returns size of the value after the append operation.
+	*/
 	uint64_t append(const std::string& k, const std::string& v) ;
+
+	/**
+		Get the substring of the value stored at key.
+		If start < end, returns substring specified by the indices.
+		If start >= end, returns an empty substring.
+	*/
 	std::string getrange(const std::string& k, int64_t str_start, int64_t str_end) ;
+
+	/**
+		Sets a value for the key starting at specified offset.
+		Returns size of the value after the setrange operation.
+	*/
 	uint64_t setrange(const std::string& k, uint64_t offset, const std::string& v) ;
+	
+	/**
+		Get the size of the value at the key.
+		Throws KeyNotFoundException if key is not found.
+		Returns size of the value at key.
+	*/
 	uint64_t size(const std::string& k) ;
+
+
+	// TODO
+	// Overloads for set, getset
+	// mset
+	// std::vector<bool> set(const key_value_container<std::string, std::string> k_v) ;
+	// mgetset
+	// std::vector<std::string> getset(const key_value_container<std::string, std::string> k_v) ;
 private :
 	std::unordered_map<std::string, std::string> r_strings_ ;
 } ;
@@ -74,7 +140,7 @@ public :
 } ;
 
 
-/*!
+/**
 @brief
 Sets a string key to a string value in the database.
 
@@ -135,7 +201,7 @@ bool DataBase<std::string, std::string>::set(
 /*!
 
 @brief
-Get a string key from the database.
+Get a value for the key from the database.
 
 @details
 Time Complexity -> O(1)
@@ -166,7 +232,7 @@ std::string DataBase<std::string, std::string>::get(
 /*!
 
 @brief
-Get multiple strings from the database.
+Get multiple values for the keys from the database.
 
 @details
 Time Complexity -> O(n)
@@ -185,7 +251,7 @@ Throws KeyNotFoundException if any get fails.
 
 @return
 std::vector<std::string>
-
+Values which exist for the keys.
 */
 std::vector<std::string> DataBase<std::string, std::string>::get(
 	const std::vector<std::string>& ks) {
@@ -544,7 +610,7 @@ uint64_t DataBase<std::string, std::string>::setrange(
 	}
 }
 
-/*!
+/**
 
 @brief
 Get the size of the value at the key.

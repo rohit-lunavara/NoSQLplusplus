@@ -1,0 +1,344 @@
+\hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4}{}\doxysection{Data\+Base$<$ std\+::string, std\+::string $>$ Class Reference}
+\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4}\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a923413e61416720655367bae11dba5a9}{set}} (const std\+::string \&k, const std\+::string \&v, std\+::initializer\+\_\+list$<$ std\+::string $>$ options=\{\})
+\item 
+std\+::string \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_aa3c447be597f489d98eaaac5a6a092a4}{get}} (const std\+::string \&k)
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a0a87ebd5b335d1ff9470eb65fcada767}{get}} (const std\+::vector$<$ std\+::string $>$ \&ks)
+\item 
+std\+::string \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_acb794bf547f4c0a6f66a3e2b1cb63a68}{getset}} (const std\+::string \&k, const std\+::string \&v)
+\item 
+bool \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abb198787370f7d6c0c008d679253a0e5}{remove}} (const std\+::string \&k)
+\item 
+bool \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a4b5e2785d3b953e0774bf8a7b9b005c5}{rename}} (const std\+::string \&old\+\_\+k, const std\+::string \&new\+\_\+k)
+\item 
+bool \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_ad76171c2f4269e1eac9706dfb0f8cb2e}{exist}} (const std\+::string \&k)
+\item 
+std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_ac43b351a8c6ac3ed3d4d6ca2db7fcf9e}{get\+\_\+keys}} ()
+\item 
+uint64\+\_\+t \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a645cb888d476322e7eafac6c73ac5687}{append}} (const std\+::string \&k, const std\+::string \&v)
+\item 
+std\+::string \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a4b6640986227d3b02844bdbd235f5c54}{getrange}} (const std\+::string \&k, int64\+\_\+t str\+\_\+start, int64\+\_\+t str\+\_\+end)
+\item 
+uint64\+\_\+t \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a625881dc7df67cd41380072a1ad18664}{setrange}} (const std\+::string \&k, uint64\+\_\+t offset, const std\+::string \&v)
+\item 
+uint64\+\_\+t \mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abae5de16bdadec7d7df72facd7818d44}{size}} (const std\+::string \&k)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 39 of file Data\+Base\+\_\+\+String.\+h.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a645cb888d476322e7eafac6c73ac5687}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a645cb888d476322e7eafac6c73ac5687}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!append@{append}}
+\index{append@{append}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{append()}{append()}}
+{\footnotesize\ttfamily uint64\+\_\+t \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::append (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k,  }\item[{const std\+::string \&}]{v }\end{DoxyParamCaption})}
+
+Appends a value to an existing key or sets a value if key does not exist. Returns size of the value after the append operation. 
+
+Definition at line 489 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{491                         \{}
+\DoxyCodeLine{492     \textcolor{keyword}{auto} k\_str = r\_strings\_.find(k) ;}
+\DoxyCodeLine{493 }
+\DoxyCodeLine{494     \textcolor{comment}{// Key already exists and is a string}}
+\DoxyCodeLine{495     \textcolor{keywordflow}{if} ( k\_str != r\_strings\_.end() ) \{}
+\DoxyCodeLine{496         k\_str-\/>second += v ;}
+\DoxyCodeLine{497         \textcolor{keywordflow}{return} ( k\_str-\/>second.size() ) ;}
+\DoxyCodeLine{498     \}}
+\DoxyCodeLine{499     \textcolor{comment}{// Key does not exist, therefore, it is created and the value is set}}
+\DoxyCodeLine{500     r\_strings\_[k] = v ;}
+\DoxyCodeLine{501     \textcolor{keywordflow}{return} ( v.size() ) ;}
+\DoxyCodeLine{502 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_ad76171c2f4269e1eac9706dfb0f8cb2e}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_ad76171c2f4269e1eac9706dfb0f8cb2e}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!exist@{exist}}
+\index{exist@{exist}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{exist()}{exist()}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::exist (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k }\end{DoxyParamCaption})}
+
+Checks if a key exists in the database. Returns true -\/$>$ If it exists, false otherwise. 
+
+Definition at line 394 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{395                         \{}
+\DoxyCodeLine{396     \textcolor{keywordflow}{return} ( r\_strings\_.find(k) != r\_strings\_.end() ) ;}
+\DoxyCodeLine{397 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_aa3c447be597f489d98eaaac5a6a092a4}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_aa3c447be597f489d98eaaac5a6a092a4}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!get@{get}}
+\index{get@{get}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::string \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::get (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k }\end{DoxyParamCaption})}
+
+Get a value for the key from the database. Throws \mbox{\hyperlink{class_key_not_found_exception}{Key\+Not\+Found\+Exception}} if key is not found. Returns value which exists for the key. 
+
+Definition at line 223 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{224                         \{}
+\DoxyCodeLine{225     \textcolor{keyword}{auto} k\_str = r\_strings\_.find(k) ;}
+\DoxyCodeLine{226     \textcolor{keywordflow}{if} ( k\_str == r\_strings\_.end() ) \{}
+\DoxyCodeLine{227         \textcolor{keywordflow}{throw} \mbox{\hyperlink{class_key_not_found_exception}{KeyNotFoundException}}();}
+\DoxyCodeLine{228     \}}
+\DoxyCodeLine{229     \textcolor{keywordflow}{return} k\_str-\/>second ;}
+\DoxyCodeLine{230 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a0a87ebd5b335d1ff9470eb65fcada767}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a0a87ebd5b335d1ff9470eb65fcada767}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!get@{get}}
+\index{get@{get}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{get()}{get()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::get (\begin{DoxyParamCaption}\item[{const std\+::vector$<$ std\+::string $>$ \&}]{ks }\end{DoxyParamCaption})}
+
+Get multiple values for the keys from the database. Throws \mbox{\hyperlink{class_key_not_found_exception}{Key\+Not\+Found\+Exception}} if any key is not found. Returns values which exist for the keys. 
+
+Definition at line 256 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{257                                     \{}
+\DoxyCodeLine{258     std::vector<std::string> vs ;}
+\DoxyCodeLine{259     vs.reserve(ks.size()) ;}
+\DoxyCodeLine{260     \textcolor{keywordflow}{for} ( \textcolor{keyword}{const} \textcolor{keyword}{auto}\& k : ks ) \{}
+\DoxyCodeLine{261         vs.push\_back(\mbox{\hyperlink{class_data_base}{DataBase<std::string, std::string>::get}}(k)) ;}
+\DoxyCodeLine{262     \}}
+\DoxyCodeLine{263     \textcolor{keywordflow}{return} vs ;}
+\DoxyCodeLine{264 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_ac43b351a8c6ac3ed3d4d6ca2db7fcf9e}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_ac43b351a8c6ac3ed3d4d6ca2db7fcf9e}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!get\_keys@{get\_keys}}
+\index{get\_keys@{get\_keys}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{get\_keys()}{get\_keys()}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::string $>$ \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::get\+\_\+keys (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+Get all the keys in the database. Returns all keys present in the database. 
+
+Definition at line 445 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{445                                                               \{}
+\DoxyCodeLine{446     std::vector<std::string> res ;}
+\DoxyCodeLine{447     res.reserve(r\_strings\_.size()) ;}
+\DoxyCodeLine{448     \textcolor{keywordflow}{for} ( \textcolor{keyword}{const} \textcolor{keyword}{auto}\& [k, v] : r\_strings\_ ) \{}
+\DoxyCodeLine{449         res.push\_back(k) ;}
+\DoxyCodeLine{450     \}}
+\DoxyCodeLine{451     \textcolor{keywordflow}{return} res ;}
+\DoxyCodeLine{452 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a4b6640986227d3b02844bdbd235f5c54}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a4b6640986227d3b02844bdbd235f5c54}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!getrange@{getrange}}
+\index{getrange@{getrange}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{getrange()}{getrange()}}
+{\footnotesize\ttfamily std\+::string \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::getrange (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k,  }\item[{int64\+\_\+t}]{str\+\_\+start,  }\item[{int64\+\_\+t}]{str\+\_\+end }\end{DoxyParamCaption})}
+
+Get the substring of the value stored at key. If start $<$ end, returns substring specified by the indices. If start $>$= end, returns an empty substring. 
+
+Definition at line 536 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{539                      \{}
+\DoxyCodeLine{540     std::string v\_str \{ \mbox{\hyperlink{class_data_base}{DataBase<std::string, std::string>::get}}(k) \} ;}
+\DoxyCodeLine{541     int64\_t v\_str\_size \{ \textcolor{keyword}{static\_cast<}int64\_t\textcolor{keyword}{>}( v\_str.size() ) \} ;}
+\DoxyCodeLine{542 }
+\DoxyCodeLine{543     \textcolor{keywordflow}{if} ( str\_start < 0 ) \{}
+\DoxyCodeLine{544         str\_start = v\_str\_size + str\_start ;}
+\DoxyCodeLine{545     \}}
+\DoxyCodeLine{546     str\_start = str\_start < 0 ? 0 : str\_start ;}
+\DoxyCodeLine{547 }
+\DoxyCodeLine{548     \textcolor{keywordflow}{if} ( str\_end < 0 ) \{}
+\DoxyCodeLine{549         str\_end = v\_str\_size + str\_end ;}
+\DoxyCodeLine{550     \}}
+\DoxyCodeLine{551     str\_end = str\_end > ( v\_str\_size -\/ 1 ) ? ( v\_str\_size -\/ 1 ) : str\_end ;}
+\DoxyCodeLine{552 }
+\DoxyCodeLine{553     \textcolor{keywordflow}{if} ( str\_start < str\_end ) \{}
+\DoxyCodeLine{554         \textcolor{keywordflow}{return} v\_str.substr(str\_start, str\_end -\/ str\_start) ;}
+\DoxyCodeLine{555     \}}
+\DoxyCodeLine{556     \textcolor{keywordflow}{return} \{\} ;}
+\DoxyCodeLine{557 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_acb794bf547f4c0a6f66a3e2b1cb63a68}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_acb794bf547f4c0a6f66a3e2b1cb63a68}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!getset@{getset}}
+\index{getset@{getset}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{getset()}{getset()}}
+{\footnotesize\ttfamily std\+::string \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::getset (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k,  }\item[{const std\+::string \&}]{v }\end{DoxyParamCaption})}
+
+Combines the get and set methods (without options). Throws \mbox{\hyperlink{class_key_not_found_exception}{Key\+Not\+Found\+Exception}} if key is not found. Returns old value which existed for the key. 
+
+Definition at line 293 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{295                         \{}
+\DoxyCodeLine{296     std::string old\_v \{ \mbox{\hyperlink{class_data_base}{DataBase<std::string, std::string>::get}}(k) \} ;}
+\DoxyCodeLine{297     \mbox{\hyperlink{class_data_base}{DataBase<std::string, std::string>::set}}(k, v) ;}
+\DoxyCodeLine{298     \textcolor{keywordflow}{return} old\_v ;}
+\DoxyCodeLine{299 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abb198787370f7d6c0c008d679253a0e5}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abb198787370f7d6c0c008d679253a0e5}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!remove@{remove}}
+\index{remove@{remove}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{remove()}{remove()}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::remove (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k }\end{DoxyParamCaption})}
+
+Removes key if it exists in the database. Returns true -\/$>$ If key removed successfully, false otherwise. 
+
+Definition at line 323 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{324                         \{}
+\DoxyCodeLine{325     \textcolor{keyword}{auto} k\_str = r\_strings\_.find(k) ;}
+\DoxyCodeLine{326     \textcolor{keywordflow}{if} ( k\_str == r\_strings\_.end() ) \{}
+\DoxyCodeLine{327         \textcolor{keywordflow}{return} false ;}
+\DoxyCodeLine{328     \}}
+\DoxyCodeLine{329     \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{330         r\_strings\_.erase(k\_str) ;}
+\DoxyCodeLine{331         \textcolor{keywordflow}{return} true ;}
+\DoxyCodeLine{332     \}}
+\DoxyCodeLine{333 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a4b5e2785d3b953e0774bf8a7b9b005c5}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a4b5e2785d3b953e0774bf8a7b9b005c5}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!rename@{rename}}
+\index{rename@{rename}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{rename()}{rename()}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::rename (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{old\+\_\+k,  }\item[{const std\+::string \&}]{new\+\_\+k }\end{DoxyParamCaption})}
+
+Renames old key name to new key name if it exists in the database. Returns true -\/$>$ If it exists and is renamed, false otherwise. 
+
+Definition at line 361 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{363                             \{}
+\DoxyCodeLine{364     \textcolor{keyword}{auto} k\_handle = r\_strings\_.extract(old\_k) ;}
+\DoxyCodeLine{365     \textcolor{keywordflow}{if} ( k\_handle.empty() ) \{}
+\DoxyCodeLine{366         \textcolor{keywordflow}{return} false ;}
+\DoxyCodeLine{367     \}}
+\DoxyCodeLine{368     \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{369         k\_handle.key() = new\_k ;}
+\DoxyCodeLine{370         r\_strings\_.insert(std::move(k\_handle)) ;}
+\DoxyCodeLine{371         \textcolor{keywordflow}{return} true ;}
+\DoxyCodeLine{372     \}}
+\DoxyCodeLine{373 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a923413e61416720655367bae11dba5a9}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a923413e61416720655367bae11dba5a9}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!set@{set}}
+\index{set@{set}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}}
+{\footnotesize\ttfamily bool \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::set (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k,  }\item[{const std\+::string \&}]{v,  }\item[{std\+::initializer\+\_\+list$<$ std\+::string $>$}]{options = {\ttfamily \{\}} }\end{DoxyParamCaption})}
+
+Sets a string key to a string value in the database. Returns true -\/$>$ If set successfully, false otherwise. 
+
+Definition at line 172 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175                                                 \{}
+\DoxyCodeLine{176     \textcolor{keyword}{auto} k\_str = r\_strings\_.find(k) ;}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178     \textcolor{comment}{// Make all options uppercase}}
+\DoxyCodeLine{179     \textcolor{keywordflow}{for} ( \textcolor{keyword}{auto}\& option : options ) \{}
+\DoxyCodeLine{180         std::for\_each(option.begin(), option.end(), ::toupper);}
+\DoxyCodeLine{181     \}}
+\DoxyCodeLine{182 }
+\DoxyCodeLine{183     \textcolor{keywordflow}{for} ( \textcolor{keyword}{const} \textcolor{keyword}{auto}\& option : options ) \{}
+\DoxyCodeLine{184         \textcolor{comment}{// NX -\/> Set if it does not exist}}
+\DoxyCodeLine{185         \textcolor{comment}{// XX -\/> Set if it exists}}
+\DoxyCodeLine{186         \textcolor{keywordflow}{if} ( ( option == \textcolor{stringliteral}{"NX"} \&\& k\_str == r\_strings\_.end() ) || ( option == \textcolor{stringliteral}{"XX"} \&\& k\_str != r\_strings\_.end() ) ) \{}
+\DoxyCodeLine{187             r\_strings\_[k] = v ;}
+\DoxyCodeLine{188             \textcolor{keywordflow}{return} true ;}
+\DoxyCodeLine{189         \}}
+\DoxyCodeLine{190     \}}
+\DoxyCodeLine{191 }
+\DoxyCodeLine{192     \textcolor{keywordflow}{if} ( options.size() == 0 ) \{}
+\DoxyCodeLine{193         r\_strings\_[k] = v ;}
+\DoxyCodeLine{194         \textcolor{keywordflow}{return} true ;}
+\DoxyCodeLine{195     \}}
+\DoxyCodeLine{196     \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{197         \textcolor{keywordflow}{return} false ;}
+\DoxyCodeLine{198     \}}
+\DoxyCodeLine{199 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a625881dc7df67cd41380072a1ad18664}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_a625881dc7df67cd41380072a1ad18664}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!setrange@{setrange}}
+\index{setrange@{setrange}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{setrange()}{setrange()}}
+{\footnotesize\ttfamily uint64\+\_\+t \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::setrange (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k,  }\item[{uint64\+\_\+t}]{offset,  }\item[{const std\+::string \&}]{v }\end{DoxyParamCaption})}
+
+Sets a value for the key starting at specified offset. Returns size of the value after the setrange operation. 
+
+Definition at line 588 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{591                         \{}
+\DoxyCodeLine{592     \textcolor{keyword}{auto} k\_str = r\_strings\_.find(k) ;}
+\DoxyCodeLine{593 }
+\DoxyCodeLine{594     \textcolor{comment}{// Padding with blank spaces instead of null characters}}
+\DoxyCodeLine{595     \textcolor{comment}{// Key does not exist}}
+\DoxyCodeLine{596     \textcolor{keywordflow}{if} ( k\_str == r\_strings\_.end() ) \{}
+\DoxyCodeLine{597         std::string padding (offset, \textcolor{charliteral}{' '}) ;}
+\DoxyCodeLine{598         r\_strings\_[k] = padding + v ;}
+\DoxyCodeLine{599         \textcolor{keywordflow}{return} ( r\_strings\_[k].\mbox{\hyperlink{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abae5de16bdadec7d7df72facd7818d44}{size}}() ) ;}
+\DoxyCodeLine{600     \}}
+\DoxyCodeLine{601     \textcolor{comment}{// Key exists}}
+\DoxyCodeLine{602     \textcolor{keywordflow}{else} \{}
+\DoxyCodeLine{603         \textcolor{keyword}{auto} k\_str\_size = k\_str-\/>second.size() ;}
+\DoxyCodeLine{604         \textcolor{keywordflow}{if} ( offset > k\_str-\/>second.size() ) \{}
+\DoxyCodeLine{605             std::string padding (offset -\/ k\_str\_size, \textcolor{charliteral}{' '}) ;}
+\DoxyCodeLine{606             k\_str-\/>second += padding ;}
+\DoxyCodeLine{607         \}}
+\DoxyCodeLine{608         k\_str-\/>second.replace(offset, v.size(), v) ;}
+\DoxyCodeLine{609         \textcolor{keywordflow}{return} ( k\_str-\/>second.size() ) ;}
+\DoxyCodeLine{610     \}}
+\DoxyCodeLine{611 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abae5de16bdadec7d7df72facd7818d44}\label{class_data_base_3_01std_1_1string_00_01std_1_1string_01_4_abae5de16bdadec7d7df72facd7818d44}} 
+\index{DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}!size@{size}}
+\index{size@{size}!DataBase$<$ std::string, std::string $>$@{DataBase$<$ std::string, std::string $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily uint64\+\_\+t \mbox{\hyperlink{class_data_base}{Data\+Base}}$<$ std\+::string, std\+::string $>$\+::size (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{k }\end{DoxyParamCaption})}
+
+Get the size of the value at the key. Throws \mbox{\hyperlink{class_key_not_found_exception}{Key\+Not\+Found\+Exception}} if key is not found. Returns size of the value at key. 
+
+Definition at line 636 of file Data\+Base\+\_\+\+String.\+h.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{637                         \{}
+\DoxyCodeLine{638     \textcolor{keywordflow}{return} \mbox{\hyperlink{class_data_base}{DataBase<std::string, std::string>::get}}(k).size() ;}
+\DoxyCodeLine{639 \}}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+core/Data\+Base\+\_\+\+String.\+h\end{DoxyCompactItemize}

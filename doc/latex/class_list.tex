@@ -1,0 +1,75 @@
+\hypertarget{class_list}{}\doxysection{List Class Reference}
+\label{class_list}\index{List@{List}}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_list_ac8658047b3abfb08e329bb40c872b92a}\label{class_list_ac8658047b3abfb08e329bb40c872b92a}} 
+bool {\bfseries exist} (const std\+::string \&key)
+\item 
+\mbox{\Hypertarget{class_list_a99949669c591c79c20a12429156bed9d}\label{class_list_a99949669c591c79c20a12429156bed9d}} 
+std\+::deque$<$ std\+::string $>$ {\bfseries get} (const std\+::string \&key)
+\item 
+\mbox{\Hypertarget{class_list_a526da020d12167ab935bc426aa54cec6}\label{class_list_a526da020d12167ab935bc426aa54cec6}} 
+bool {\bfseries remove} (const std\+::string \&key)
+\item 
+\mbox{\Hypertarget{class_list_ac77993f6e92ec46e410c1017cfa18ac2}\label{class_list_ac77993f6e92ec46e410c1017cfa18ac2}} 
+bool {\bfseries rename} (const std\+::string \&key, const std\+::string \&newkey)
+\item 
+\mbox{\Hypertarget{class_list_a80a3cb5842c4693c204445e70adfa1a8}\label{class_list_a80a3cb5842c4693c204445e70adfa1a8}} 
+string {\bfseries lpop} (string key)
+\item 
+\mbox{\Hypertarget{class_list_abd4de5cdc5c5232dcbc6fde3c9efc084}\label{class_list_abd4de5cdc5c5232dcbc6fde3c9efc084}} 
+string {\bfseries rpop} (string key)
+\item 
+\mbox{\Hypertarget{class_list_af612740d151be7db65cc16e6d5771e0e}\label{class_list_af612740d151be7db65cc16e6d5771e0e}} 
+bool {\bfseries set} (const std\+::string \&key, const string \&value, std\+::initializer\+\_\+list$<$ std\+::string $>$ options)
+\item 
+\mbox{\Hypertarget{class_list_a651d0d9e9637f80dea3190c869ac99b2}\label{class_list_a651d0d9e9637f80dea3190c869ac99b2}} 
+int {\bfseries lpush} (string key, string value)
+\item 
+\mbox{\Hypertarget{class_list_ab59a6bc7d788a4ef9233b1d49593027a}\label{class_list_ab59a6bc7d788a4ef9233b1d49593027a}} 
+int {\bfseries rpush} (string key, string value)
+\item 
+\mbox{\Hypertarget{class_list_a26ab40afccde20e929b52eade0432879}\label{class_list_a26ab40afccde20e929b52eade0432879}} 
+int {\bfseries lpushx} (string key, string value)
+\item 
+\mbox{\Hypertarget{class_list_af8ee87d4c36d3cea8f944f4ec4178919}\label{class_list_af8ee87d4c36d3cea8f944f4ec4178919}} 
+int {\bfseries rpushx} (string key, string value)
+\item 
+\mbox{\Hypertarget{class_list_a6ff407fc5c7f770429a2a4d03f275bb5}\label{class_list_a6ff407fc5c7f770429a2a4d03f275bb5}} 
+int {\bfseries linsert} (string key, string pivot, string value, bool before)
+\item 
+\mbox{\Hypertarget{class_list_a7dcbcebec164c0def206e9bac6819d6f}\label{class_list_a7dcbcebec164c0def206e9bac6819d6f}} 
+vector$<$ string $>$ {\bfseries lrange} (string key, int start, int end)
+\item 
+\mbox{\Hypertarget{class_list_a8be123748e05bc83775ee4b0ca32a9cf}\label{class_list_a8be123748e05bc83775ee4b0ca32a9cf}} 
+bool {\bfseries lset} (string key, int idx, string value)
+\item 
+\mbox{\Hypertarget{class_list_a5d76cdec2f4dc2a7a68bc01a35b5b4e2}\label{class_list_a5d76cdec2f4dc2a7a68bc01a35b5b4e2}} 
+int {\bfseries lrem} (string key, int count, string value)
+\item 
+\mbox{\Hypertarget{class_list_af8b327ce697832b363a948759ac27dc0}\label{class_list_af8b327ce697832b363a948759ac27dc0}} 
+int {\bfseries ltrim} (string key, int start, int end)
+\item 
+\mbox{\Hypertarget{class_list_a628d8123f964bb76c6297236ecc4b53e}\label{class_list_a628d8123f964bb76c6297236ecc4b53e}} 
+string {\bfseries rpoplpush} (string source, string destination)
+\item 
+\mbox{\Hypertarget{class_list_ab810ce6009ff1d01b89a8e5beeaff446}\label{class_list_ab810ce6009ff1d01b89a8e5beeaff446}} 
+string {\bfseries lindex} (string key, int idx)
+\item 
+\mbox{\Hypertarget{class_list_a7bee0703c4114449b155296f326a61d9}\label{class_list_a7bee0703c4114449b155296f326a61d9}} 
+int {\bfseries llen} (string key)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 20 of file Data\+Base\+\_\+\+List.\+h.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+core/Data\+Base\+\_\+\+List.\+h\item 
+core/Data\+Base\+\_\+\+List.\+cpp\end{DoxyCompactItemize}
