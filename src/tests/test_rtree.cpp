@@ -4,6 +4,10 @@
 #include <string>
 #include <set>
 #include <unordered_map>
+#include <chrono>
+#include <random>
+#include <functional>
+
 #include "SphericalRTree.h"
 #include "GeoCoordinate.h"
 
@@ -277,6 +281,61 @@ void test6()
         cout << results.size() << endl;
 }
 
+
+void test7()
+{
+        using namespace Geography;
+        SphericalRTree<int> rtree;
+
+        ofstream fout("output.txt");
+        vector<int> Ns {10, 100, 1000, 10000, 100000, 1000000, 10000000};
+        for (auto N : Ns)
+        {
+
+        unsigned seed1 = chrono::high_resolution_clock
+		::now().time_since_epoch().count();
+	default_random_engine gen1(seed1);
+	uniform_real_distribution<double> dist1(-180., 180.);
+	auto dice1 = bind(dist1, gen1);
+
+        unsigned seed2 = chrono::high_resolution_clock
+		::now().time_since_epoch().count();
+	default_random_engine gen2(seed2);
+	uniform_real_distribution<double> dist2(-90., 90.);
+	auto dice2 = bind(dist2, gen2);
+        
+        
+        vector<GeoCoordinate> records;
+        for (int i = 0; i < N; ++i)
+        {
+                GeoCoordinate temp { dice2(), dice1() };
+                // cout << temp << endl;
+                rtree.insert(i, temp, 0.);
+                records.push_back(temp);
+        }
+
+        auto t1 = chrono::high_resolution_clock::now();	
+        rtree.search({0., 0.}, 10);
+        auto t2 = chrono::high_resolution_clock::now();
+	auto time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
+        fout << N << "\t" << time_span.count() << "\t";
+
+        t1 = chrono::high_resolution_clock::now();	
+        for (const auto& a : records)
+        {
+                if (distance(a, {0., 0.}) < 10.)
+                {
+                        // do nothing
+                }
+        }
+        t2 = chrono::high_resolution_clock::now();
+        time_span = chrono::duration_cast<chrono::duration<double>>(t2 - t1);
+        fout << time_span.count() << endl;
+
+        }
+
+}
+
 int main()
 {
         // test1();
@@ -284,7 +343,8 @@ int main()
         // test3();
         // test4();
         // test5();
-        test6();
+        // test6();
+        test7();
 
         return 0;
 }

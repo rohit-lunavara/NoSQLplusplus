@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
+#include <random>
+#include <chrono>
 #include "DataBase.h"
 
 using namespace std;
@@ -107,6 +109,7 @@ void test3()
         }
 }
 
+
 void test_interactive()
 {
         using namespace Geography;
@@ -172,26 +175,34 @@ void test_interactive()
                 if (opt == "radius")
                 {
                         string cityname, state;
-                        getline(ss, cityname, ',');
-                        getline(ss, state, ' ');
-                        getline(ss, state, ' ');
-                       
+                        double rad;
 
-                        string radius;
-                        getline(ss, radius, '\n');
-                        double rad = stof(radius);
-
-                        cout << "[query]" << "cityname: " << cityname
+                        try {
+                                string radius;
+                                getline(ss, cityname, ',');
+                                getline(ss, state, ' ');
+                                getline(ss, state, ' ');
+                                getline(ss, radius, '\n');
+                                rad = stof(radius);
+                        } catch (const std::exception& e)
+                        {
+                                cout << "non valid query!\n";
+                                cout << "================\n";
+                                continue;
+                        }
+                        cout << "[query] " << "cityname: " << cityname
                                 << ", state: " << state
                                 << ", radius: " << rad << "\n";
+                        
                         set<string> results = db.radius(cityname + ", " + state, rad);
                         cout << "[results]\n";
                         for (const auto& r : results)
                         {
                                 cout << r << ", distance: "
                                         << db.distance(r, cityname + ", " + state) 
-                                        << "\n";
-                        }    
+                                        << "km\n";
+                        }
+                        cout << "================\n";
                 }
                 else if (opt == "rename")
                 {
@@ -219,6 +230,56 @@ void test_interactive()
                         {
                                 cout << "failed\n";
                         }
+                        cout << "================\n";
+                }
+                else if (opt == "get")
+                {
+                        string cityname, state;
+                        getline(ss, cityname, ',');
+                        getline(ss, state, ' ');
+                        getline(ss, state, ' ');
+
+                        string city = cityname + ", " + state;
+                        
+                        cout << "[query] get " << city << "\n";
+                        try {
+                                cout << "location of " << city << " is "
+                                        << db.get(city) << "\n";
+                        } catch (const std::exception& e)
+                        {
+                                cout << "No such city!\n";
+                        }
+
+                        cout << "================\n";                       
+                }
+                else if (opt == "distance")
+                {
+                        string cityname1, state1;
+                        getline(ss, cityname1, ',');
+                        getline(ss, state1, ' ');
+                        getline(ss, state1, ' ');
+
+                        string cityname2, state2;
+                        getline(ss, cityname2, ',');
+                        getline(ss, state2, ' ');
+                        getline(ss, state2, ' ');    
+
+                        string city1 = cityname1 + ", " + state1;
+                        string city2 = cityname2 + ", " + state2;
+
+                        cout << "[command] distance " << city1 << " and "
+                                << city2 << "\n";
+                        double distance = db.distance(city1, city2);
+                        if (distance > 0.)
+                        {
+                                cout << "distance between " << city1 
+                                << " and " << city2 << " is " << distance << "\n";
+                        }
+                        else {
+                                cout << "some cities does not exist\n";
+                        }
+                        cout << "================\n";
+
                 }
                 else if (opt == "exit")
                 {
@@ -227,6 +288,8 @@ void test_interactive()
                 else
                 {
                         cout << "[command] not supported\n";
+                        cout << "================\n";
+                        continue;
                 }
 
         }
@@ -240,6 +303,7 @@ int main()
 	// test1();
 	// test2();
         // test3();
+        // test4();
 
 	// this does not compile
 	// DataBase<int, int> db;
@@ -250,6 +314,7 @@ int main()
 	// DataBase<SupportedKey, string> db;
 
         test_interactive();
+
 
 	return 0;
 }
